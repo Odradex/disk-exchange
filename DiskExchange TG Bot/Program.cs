@@ -6,7 +6,7 @@ namespace DiskExchange_TG_Bot
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("TEST github");
+            Console.WriteLine("Hello me");
         }
     }
 }
