@@ -1,0 +1,16 @@
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.exe
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.AssemblyInfoInputs.cache
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.AssemblyInfo.cs
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.deps.json
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.runtimeconfig.json
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.runtimeconfig.dev.json
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\Telegram.Bot.dll
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CoreCompileInputs.cache
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CopyComplete
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
+X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.genruntimeconfig.cache
