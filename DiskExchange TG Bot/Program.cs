@@ -62,6 +62,7 @@ namespace DiskExchange_TG_Bot
                 case "/start":
                    await bot.SendTextMessageAsync(message.From.Id,$"Привет { message.From.Username}, это бот по обмену дисками!");
                     break;
+
                 case "/dev":
                     var inlinekeyboard = new InlineKeyboardMarkup(new[]
                     {
@@ -79,6 +80,7 @@ namespace DiskExchange_TG_Bot
                     await bot.SendTextMessageAsync(message.From.Id, "Выберите пунк меню",
                         replyMarkup: inlinekeyboard);
                     break;
+
                 case "/keyboard":
                     startKeyboard:
                     var replyKeyboard = new ReplyKeyboardMarkup(new[]
