@@ -5,6 +5,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using System.Reflection;
+using Telegram.Bot.Args;
 
 namespace DiskExchange_TG_Bot
 {
@@ -15,18 +16,7 @@ namespace DiskExchange_TG_Bot
         {
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(10)};
             bot.OnMessage += Bot_OnMessage;
-            //var keyboar = new
-            //    ReplyKeyboardMarkup
-            //{
-            //    Keyboard = new[] {
-            //new KeyboardButton[]
-            //{
-            //    "Help",
-            //    "About",
-            //}
-            //}
-            //};
-            
+           
             bot.StartReceiving();
             Console.WriteLine($"Starting bot {bot.GetMeAsync().Result}...");
             Console.ReadKey();
@@ -36,8 +26,9 @@ namespace DiskExchange_TG_Bot
         {
             var text = e.Message.Text;
             var message = e.Message;
-            Console.WriteLine(e.Message.From.Username + ": " + text);
-           await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
+            Console.WriteLine($"id {message.Chat.Id}");
+            Console.WriteLine(e.Message.From.Username + ": " + text); 
+            await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
             switch (message.Text)
             {
                 case "/start":
@@ -59,6 +50,30 @@ namespace DiskExchange_TG_Bot
                     });
                     await bot.SendTextMessageAsync(message.From.Id, "Выберите пунк меню",
                         replyMarkup: inlinekeyboard);
+                    break;
+                case "/keyboard":
+                    var replyKeyboard = new ReplyKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            new KeyboardButton("Поиск"),
+                            new KeyboardButton("Мой профиль")
+                        },
+                        new[]
+                        {
+                            //new KeyboardButton("Геолокация"){RequestLocation = true},
+                            //new KeyboardButton("Контакт"){RequestContact = true}
+                            new KeyboardButton("Избранное"),
+                            new KeyboardButton("Помощь"),
+                            new KeyboardButton("Контакты")
+                        }
+
+                    }
+                    );
+                   
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Сообщение",
+                        replyMarkup: replyKeyboard);
+                  
                     break;
                 case "/poll":
                     {
