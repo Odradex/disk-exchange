@@ -4705,19 +4705,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\adm\\.nuget\\packages\\": {}
+    "C:\\Users\\King\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "X:\\Git Repos\\disk-exchange\\DiskExchange TG Bot\\DiskExchange TG Bot.csproj",
+      "projectUniqueName": "C:\\Users\\King\\source\\repos\\ProjectBot\\DiskExchange TG Bot\\DiskExchange TG Bot.csproj",
       "projectName": "DiskExchange TG Bot",
-      "projectPath": "X:\\Git Repos\\disk-exchange\\DiskExchange TG Bot\\DiskExchange TG Bot.csproj",
-      "packagesPath": "C:\\Users\\adm\\.nuget\\packages\\",
-      "outputPath": "X:\\Git Repos\\disk-exchange\\DiskExchange TG Bot\\obj\\",
+      "projectPath": "C:\\Users\\King\\source\\repos\\ProjectBot\\DiskExchange TG Bot\\DiskExchange TG Bot.csproj",
+      "packagesPath": "C:\\Users\\King\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\King\\source\\repos\\ProjectBot\\DiskExchange TG Bot\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\adm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\King\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4761,7 +4761,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
       }
     }
   }
