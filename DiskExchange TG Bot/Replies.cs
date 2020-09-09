@@ -9,7 +9,7 @@ namespace DiskExchange_TG_Bot
     {
         struct keyboards
         {
-            public static ReplyKeyboardMarkup mainMenu
+            public static ReplyKeyboardMarkup main
             {
                 get{
                     return new ReplyKeyboardMarkup(new[] {
@@ -25,9 +25,36 @@ namespace DiskExchange_TG_Bot
                         resizeKeyboard: true);
                 }
             }
-
+            public static ReplyKeyboardMarkup help
+            {
+                get{
+                    return new ReplyKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            new KeyboardButton("Геолокация") { RequestLocation = true },
+                            new KeyboardButton("Контакт") { RequestContact = true },
+                            new KeyboardButton("Назад")
+                        }
+                    },
+                        resizeKeyboard: true);
+                }
+            }
+            public static InlineKeyboardMarkup newDisc
+            {
+                get
+                {
+                    return new InlineKeyboardMarkup(new[]
+                    {
+                    new[]{
+                        InlineKeyboardButton.WithCallbackData("TEST")
+                    }
+                }
+                    );
+                }
+            }
         }
-       
+        
 
     }
 }
