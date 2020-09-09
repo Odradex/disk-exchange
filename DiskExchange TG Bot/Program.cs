@@ -35,7 +35,7 @@ namespace DiskExchange_TG_Bot
         {
             var text = e.Message.Text;
             var message = e.Message;
-            Console.WriteLine(e.Message.From.Username + ": " + text);
+            Console.WriteLine("name: " + e.Message.From.FirstName +" "+e.Message.From.LastName + ", user:" + e.Message.From.Username + ": " + text);
             if (e.Message.Photo == null)
                 await bot.SendTextMessageAsync(message.Chat.Id, "Фото нет");
             else
