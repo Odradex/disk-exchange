@@ -6,6 +6,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using System.Reflection;
 using Telegram.Bot.Args;
+using System.Collections.Generic;
 
 namespace DiskExchange_TG_Bot
 {
@@ -16,7 +17,7 @@ namespace DiskExchange_TG_Bot
         {
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(10)};
             bot.OnMessage += Bot_OnMessage;
-           
+            
             bot.StartReceiving();
             Console.WriteLine($"Starting bot {bot.GetMeAsync().Result}...");
             Console.ReadKey();
@@ -48,32 +49,12 @@ namespace DiskExchange_TG_Bot
                             InlineKeyboardButton.WithCallbackData("Пункт 1")
                         }
                     });
-                    await bot.SendTextMessageAsync(message.From.Id, "Выберите пунк меню",
+                    await bot.SendTextMessageAsync(message.From.Id, "Выберите пункт меню",
                         replyMarkup: inlinekeyboard);
                     break;
                 case "/keyboard":
-                    var replyKeyboard = new ReplyKeyboardMarkup(new[]
-                    {
-                        new[]
-                        {
-                            new KeyboardButton("Поиск"),
-                            new KeyboardButton("Мой профиль")
-                        },
-                        new[]
-                        {
-                            //new KeyboardButton("Геолокация"){RequestLocation = true},
-                            //new KeyboardButton("Контакт"){RequestContact = true}
-                            new KeyboardButton("Избранное"),
-                            new KeyboardButton("Помощь"),
-                            new KeyboardButton("Контакты")
-                        }
-
-                    }
-                    );
-                   
-                    await bot.SendTextMessageAsync(message.Chat.Id, "Сообщение",
-                        replyMarkup: replyKeyboard);
-                  
+                   await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
+                        replyMarkup: Replies.keyboards.mainMenu);
                     break;
                 case "/poll":
                     {
