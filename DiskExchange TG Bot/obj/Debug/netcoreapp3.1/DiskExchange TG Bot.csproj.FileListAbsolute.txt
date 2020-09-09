@@ -30,3 +30,19 @@ C:\Users\King\source\repos\ProjectBot\DiskExchange TG Bot\obj\Debug\netcoreapp3.
 C:\Users\King\source\repos\ProjectBot\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
 C:\Users\King\source\repos\ProjectBot\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
 C:\Users\King\source\repos\ProjectBot\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.genruntimeconfig.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.exe
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.deps.json
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.runtimeconfig.json
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.runtimeconfig.dev.json
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\Telegram.Bot.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.AssemblyInfoInputs.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.AssemblyInfo.cs
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CoreCompileInputs.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CopyComplete
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.genruntimeconfig.cache

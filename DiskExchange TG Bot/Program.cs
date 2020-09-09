@@ -1,141 +1,102 @@
-﻿using System;
+﻿
+using System;
 using Telegram.Bot;
-using Telegram.Bot.Types;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineQueryResults;
-using System.Reflection;
-using Telegram.Bot.Args;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace DiskExchange_TG_Bot
 {
     class Program
     {
         private static ITelegramBotClient bot;
+        private const string placeholderImageId = "AgACAgIAAxkBAAIEql9Y8CVaZ_9pDW7oj0yccav567XtAAIwrzEbEmfJSvG28vI5sia7GOc-li4AAwEAAwIAA3gAA7zAAQABGwQ";
         static void Main(string[] args)
         {
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(10)};
             bot.OnMessage += Bot_OnMessage;
-           // bot.OnCallbackQuery += BotOnCallbackQueryReceived;
+            bot.OnCallbackQuery += Bot_OnCallbackQuery;
+            
             bot.StartReceiving();
             Console.WriteLine($"Starting bot {bot.GetMeAsync().Result}...");
             Console.ReadKey();
         }
 
-        //private static async void BotOnCallbackQueryReceived(object sender, CallbackQueryEventArgs e)
-        //{
-        //    string buttonText = e.CallbackQuery.Data;
-        //    string name = $"{e.CallbackQuery.From.FirstName} {e.CallbackQuery.From.LastName}";
-        //    Console.WriteLine($"{name} нажал кнопку: '{buttonText}' ");
-        //    switch (buttonText)
-        //    {
-        //        case "Контакты":
-        //            var inlineKeyboard1 = new InlineKeyboardMarkup(new[]
-        //              {
-        //                new[]
-        //                {
-        //                    InlineKeyboardButton.WithUrl("Developer_1", "https://vk.com/blanker_bat"),
-        //                    InlineKeyboardButton.WithUrl("Developer_1", "https://vk.com/mr666tema666")
-
-        //                }
-        //            });
-        //            await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,"Контакты");
-        //            //await bot.SendTextMessageAsync(e.CallbackQuery.Id, $"Контакты",
-        //                //replyMarkup: inlineKeyboard1);
-        //            break;
-        //            //await bot.SendTextMessageAsync(message.From.Id, "Выберите пунк меню",
-        //            //  replyMarkup: inlinekeyboard);
-        //    }
-        //}
+        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        {
+            var data = e.CallbackQuery.Data;
+            var message = e.CallbackQuery.Message;
+            Console.WriteLine("query recived:" + data);
+            if (data == "TEST")
+                bot.EditMessageTextAsync(message.Chat.Id, message.MessageId, message.Text + "TEST", 
+                    replyMarkup: Replies.keyboards.newDisc);
+        }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var text = e.Message.Text;
             var message = e.Message;
-            Console.WriteLine($"id {message.Chat.Id}");
-            Console.WriteLine(e.Message.From.Username + ": " + text); 
-            await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
+            Console.WriteLine(e.Message.From.Username + ": " + text);
+            if (e.Message.Photo == null)
+                await bot.SendTextMessageAsync(message.Chat.Id, "Фото нет");
+            else
+                await bot.SendTextMessageAsync(message.Chat.Id, "Фото есть");
             switch (message.Text)
             {
-                case "/start":
-                   await bot.SendTextMessageAsync(message.From.Id,$"Привет { message.From.Username}, это бот по обмену дисками!");
+                default:
+                    await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
                     break;
+
+                case "/start":
+                    await bot.SendTextMessageAsync(message.From.Id,$"Привет {message.From.Username}, это бот по обмену дисками!");
+                    await bot.DeleteMessageAsync(message.Chat.Id, message.MessageId);
+                    break;
+
                 case "/dev":
                     var inlinekeyboard = new InlineKeyboardMarkup(new[]
                     {
-                        new[]
-                        {
-                            InlineKeyboardButton.WithUrl("Developer_1", "https://vk.com/blanker_bat"),
-                            InlineKeyboardButton.WithUrl("Developer_1", "https://vk.com/mr666tema666")
-                            
+                        new[]{
+                            InlineKeyboardButton.WithUrl("Сиваков Даниил", "https://vk.com/blanker_bat"),
+                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666")
                         },
-                        new[]
-                        {
+                        new[]{
                             InlineKeyboardButton.WithCallbackData("Пункт 1")
                         }
                     });
-                    await bot.SendTextMessageAsync(message.From.Id, "Выберите пунк меню",
+                    await bot.SendTextMessageAsync(message.From.Id, "Выберите пункт меню",
                         replyMarkup: inlinekeyboard);
                     break;
+
                 case "/keyboard":
-                    startKeyboard:
-                    var replyKeyboard = new ReplyKeyboardMarkup(new[]
-                    {
-                        new[]
-                        {
-                            new KeyboardButton("Поиск"),
-                            new KeyboardButton("Мой профиль")
-                        },
-                        new[]
-                        {
-                            
-                            new KeyboardButton("Избранное"),
-                            new KeyboardButton("Помощь")
-                            
-                        }
-
-                    }
-                    );
-                   
-                    await bot.SendTextMessageAsync(message.Chat.Id, "Сообщение",
-                        replyMarkup: replyKeyboard);
-                  
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
+                        replyMarkup: Replies.keyboards.help);
                     break;
 
-                case "Помощь":
-                    var replyKeyboard1 = new ReplyKeyboardMarkup(new[]
-                    {
-                        new[]
-                        {
-                             new KeyboardButton("Геолокация"){RequestLocation = true},
-                             new KeyboardButton("Контакт"){RequestContact = true},
-                             new KeyboardButton("Назад")
-
-
-
-                        }
-                    }
-                    );
-                    await bot.SendTextMessageAsync(message.Chat.Id, "Сообщение",
-                       replyMarkup: replyKeyboard1);
-                    break;
                 case "Назад":
-                    goto startKeyboard;
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
+                        replyMarkup: Replies.keyboards.main);
                     break;
+
+                case "Помощь ❓":
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
+                        replyMarkup: Replies.keyboards.help);
+                    break;
+
+                case "Товар":
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Создание нового товара...", 
+                        replyMarkup: Replies.keyboards.newDisc);
+                    break;
+
                 case "/poll":
-                    {
-                       await bot.SendPollAsync(
+                    await bot.SendPollAsync(
                         chatId: e.Message.Chat,
                         question: "This is the testing poll question.",
-                        options: new[]
-                        {
+                        options: new[]{
                         "Option 1",
                         "Option 2"
                         }
                     );
-                    }
+                    break;
+                case "TEST":
                     break;
             }
 
