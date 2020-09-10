@@ -68,7 +68,43 @@ namespace DiskExchange_TG_Bot
         }
         public struct disc
         {
-            
+            public static InlineKeyboardMarkup diskKeyboard
+            {
+                get
+                {
+                    string uploadPhoto = "Загрузить фото";
+                    string editName = "Изменить название";
+                    string ps = "PS4";
+                    string xbox = "Xbox";
+                    string switchN = "Switch";
+                    string sell = "Продать";
+                    string exchange = "Обменять";
+                    return new InlineKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(uploadPhoto)
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(editName)
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(ps),
+                            InlineKeyboardButton.WithCallbackData(xbox),
+                            InlineKeyboardButton.WithCallbackData(switchN)
+                        },
+                        new[]
+                        {
+                            InlineKeyboardButton.WithCallbackData(sell),
+                            InlineKeyboardButton.WithCallbackData(exchange)
+                        }
+
+
+                    });
+                }
+            }
         }
 
     }

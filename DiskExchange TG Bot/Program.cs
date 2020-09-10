@@ -32,7 +32,7 @@ namespace DiskExchange_TG_Bot
         {
             var text = e.Message.Text;
             var message = e.Message;
-            Console.WriteLine($"Recived message from user {message.From.Username} ({message.From.Id}): " + text);
+            Console.WriteLine($"Recived message from user {message.From.FirstName} : {message.From.Username} ({message.From.Id}): " + text);
 
             Disc currentDisk = new Disc(message.From.Id);
             await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
@@ -70,7 +70,7 @@ namespace DiskExchange_TG_Bot
 
                 case "Товар":
                     await bot.SendTextMessageAsync(message.Chat.Id, "Создание нового товара...", 
-                        replyMarkup: Replies.keyboards.newDisc);
+                        replyMarkup: Replies.disc.diskKeyboard);
                     break;
 
                 case "/poll":
