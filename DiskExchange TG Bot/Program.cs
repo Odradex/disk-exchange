@@ -1,4 +1,4 @@
-﻿// 1.2
+﻿// 1.2.1
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
@@ -38,7 +38,7 @@ namespace DiskExchange_TG_Bot
             int test = 534;
             Console.WriteLine("name: " + e.Message.From.FirstName +" "+e.Message.From.LastName + ", user:" + e.Message.From.Username + ": " + text);
             Disc currentDisk = new Disc(test);
-            await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
+           //await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
 
             switch (message.Text)
             {
@@ -52,21 +52,6 @@ namespace DiskExchange_TG_Bot
                     await bot.DeleteMessageAsync(message.Chat.Id, message.MessageId);
                     break;
 
-                case "/dev":
-                    var inlinekeyboard = new InlineKeyboardMarkup(new[]
-                    {
-                        new[]{
-                            InlineKeyboardButton.WithUrl("Сиваков Даниил", "https://vk.com/blanker_bat"),
-                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666")
-                        },
-                        new[]{
-                            InlineKeyboardButton.WithCallbackData("Пункт 1")
-                        }
-                    });
-                    await bot.SendTextMessageAsync(message.From.Id, "Выберите пункт меню",
-                        replyMarkup: inlinekeyboard);
-                    break;
-
                 case "/keyboard":
                     await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
                         replyMarkup: Replies.keyboards.help);
@@ -75,6 +60,11 @@ namespace DiskExchange_TG_Bot
                 case "Назад":
                     await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
                         replyMarkup: Replies.keyboards.main);
+                    break;
+
+                case "Контакты":
+                    await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
+                        replyMarkup: Replies.keyboards.contact);
                     break;
 
                 case "Помощь ❓":
