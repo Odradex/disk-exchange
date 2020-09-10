@@ -1,4 +1,4 @@
-﻿
+﻿//Версия 1.0
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
@@ -36,14 +36,13 @@ namespace DiskExchange_TG_Bot
             var text = e.Message.Text;
             var message = e.Message;
             Console.WriteLine("name: " + e.Message.From.FirstName +" "+e.Message.From.LastName + ", user:" + e.Message.From.Username + ": " + text);
-            if (e.Message.Photo == null)
-                await bot.SendTextMessageAsync(message.Chat.Id, "Фото нет");
-            else
-                await bot.SendTextMessageAsync(message.Chat.Id, "Фото есть");
+            
+
             switch (message.Text)
             {
                 default:
-                    await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
+                    await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);
+                    //await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
                     break;
 
                 case "/start":
