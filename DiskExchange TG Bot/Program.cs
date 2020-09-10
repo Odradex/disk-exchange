@@ -1,4 +1,4 @@
-﻿// 1.2.1
+﻿// 1.3
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
@@ -9,7 +9,7 @@ namespace DiskExchange_TG_Bot
     class Program
     {
         private static ITelegramBotClient bot;
-        private const string placeholderImageId = "AgACAgIAAxkBAAIEql9Y8CVaZ_9pDW7oj0yccav567XtAAIwrzEbEmfJSvG28vI5sia7GOc-li4AAwEAAwIAA3gAA7zAAQABGwQ";
+        private const string placeholderImageId = "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
         static void Main(string[] args)
         {
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(60)};
@@ -26,25 +26,21 @@ namespace DiskExchange_TG_Bot
             var data = e.CallbackQuery.Data;
             var message = e.CallbackQuery.Message;
             Console.WriteLine("query recived:" + data);
-            if (data == "TEST")
-                bot.EditMessageTextAsync(message.Chat.Id, message.MessageId, message.Text + "TEST", 
-                    replyMarkup: Replies.keyboards.newDisc);
         }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var text = e.Message.Text;
             var message = e.Message;
-            int test = 534;
-            Console.WriteLine("name: " + e.Message.From.FirstName +" "+e.Message.From.LastName + ", user:" + e.Message.From.Username + ": " + text);
-            Disc currentDisk = new Disc(test);
-           //await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
+            Console.WriteLine($"Recived message from user {message.From.Username} ({message.From.Id}): " + text);
+
+            Disc currentDisk = new Disc(message.From.Id);
+            await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
 
             switch (message.Text)
             {
                 default:
                     await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);
-                    //await bot.SendTextMessageAsync(e.Message.Chat, $"Вы написали: {text}");
                     break;
 
                 case "/start":
@@ -90,8 +86,6 @@ namespace DiskExchange_TG_Bot
                 case "TEST":
                     break;
             }
-
-            
         }
     }
 }

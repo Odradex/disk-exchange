@@ -54,21 +54,22 @@ namespace DiskExchange_TG_Bot
             
                 }
             }
-            public static InlineKeyboardMarkup newDisc
+            public static InlineKeyboardMarkup Disc
             {
                 get
                 {
-                    return new InlineKeyboardMarkup(new[]
-                    {
-                    new[]{
-                        InlineKeyboardButton.WithCallbackData("TEST")
-                    }
-                }
-                    );
+                    return new InlineKeyboardMarkup(new[] {
+                        new[]{
+                            InlineKeyboardButton.WithCallbackData("Ввести название ")
+                        }
+                    });
                 }
             }
         }
-        
+        public struct disc
+        {
+            
+        }
 
     }
 }

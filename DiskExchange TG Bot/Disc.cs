@@ -6,35 +6,41 @@ namespace DiskExchange_TG_Bot
 {
     class Disc
     {
-        string game; //Name of the game
-        double price; //Game's price. If set to 0, price will not display in the message
-        int discId; //Id of the disc for the database
-        public int userId;//User's id for the database
-        string exchange; //Games that seller wants to exchange for. If set to null, will not display
-        short platform; //Game platform (1-PS4 2-XONE 3-SWITCH)
+        private string[] platformNames = {"PS4","Xbox One","Swtich"};
+        int userId; //User id
+        string photoId; //file_id for disk photo
 
-        public string message;
-        string photoId 
+        public string message //Text for the disk message. Generates automaticly, read-only
         {
-            get { return photoId; } 
-            set
+            get
             {
-                photoId = value;
+                return
+                    $"💿Игра:{name} | {platformNames[platform]}\n" +
+                    $"💵Цена: {((price > 0) ? Convert.ToString(price) : "Не указана")}\n" + (exchange != "" ?
+                    $"🔄Обмен на: {exchange}\n" : "") +
+                    $"📍Расположение:{location}";
             }
-        } //file_id for disk's photo
-        string gameName
-        {
-            get { return gameName; }
-            set
-            {
-                gameName = value;
-            }
-        }//name of the selling game
+        }
+
+        string name; //Name of the game
+        double price; //Game price. If set to 0, price will not display in the message
+        byte platform; //Game platform (1-PS4 2-XONE 3-SWITCH)
+        string exchange; //Games that seller wants to exchange for. If set to null, will not display
+        string location; //Seller city
+
         public Disc(int user)
         {
+            photoId = "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
+            exchange = "";
+            location = "Минск";
             userId = user;
-            message = "[Фото]\n💿:[Название] | [Платформа]\n💵Цена:[Цена]\n🔄Обмен на:[Обмен]\n📍Расположение:[Местоположение]";
-
         }
+
+        public void SetPhoto(string fileId) { photoId = fileId; }
+        public void SetPrice(int p) { price = p; }
+        public void SetExchange(string e) { exchange = e; }
+        public void SetPlatform(byte b) { platform = b; }
+        public void SetName(string n) { name = n; }
+        
     }
 }
