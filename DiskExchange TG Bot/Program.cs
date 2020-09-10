@@ -1,4 +1,4 @@
-﻿// 1.1
+﻿// 1.2
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
@@ -12,7 +12,7 @@ namespace DiskExchange_TG_Bot
         private const string placeholderImageId = "AgACAgIAAxkBAAIEql9Y8CVaZ_9pDW7oj0yccav567XtAAIwrzEbEmfJSvG28vI5sia7GOc-li4AAwEAAwIAA3gAA7zAAQABGwQ";
         static void Main(string[] args)
         {
-            bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(10)};
+            bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(60)};
             bot.OnMessage += Bot_OnMessage;
             bot.OnCallbackQuery += Bot_OnCallbackQuery;
             
@@ -35,8 +35,10 @@ namespace DiskExchange_TG_Bot
         {
             var text = e.Message.Text;
             var message = e.Message;
+            int test = 534;
             Console.WriteLine("name: " + e.Message.From.FirstName +" "+e.Message.From.LastName + ", user:" + e.Message.From.Username + ": " + text);
-            
+            Disc currentDisk = new Disc(test);
+            await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
 
             switch (message.Text)
             {
