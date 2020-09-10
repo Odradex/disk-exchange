@@ -22,6 +22,14 @@ namespace DiskExchange_TG_Bot
                 photoId = value;
             }
         } //file_id for disk's photo
+        string gameName
+        {
+            get { return gameName; }
+            set
+            {
+                gameName = value;
+            }
+        }//name of the selling game
         public Disc(int user)
         {
             userId = user;

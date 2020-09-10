@@ -31,13 +31,27 @@ namespace DiskExchange_TG_Bot
                     return new ReplyKeyboardMarkup(new[]
                     {
                         new[]
-                        {
-                            new KeyboardButton("Геолокация") { RequestLocation = true },
-                            new KeyboardButton("Контакт") { RequestContact = true },
+                        {  
+                            new KeyboardButton("Контакты"),
                             new KeyboardButton("Назад")
                         }
                     },
                         resizeKeyboard: true);
+                }
+            }
+            public static InlineKeyboardMarkup contact
+            {
+                get
+                {
+                    return new InlineKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            InlineKeyboardButton.WithUrl("Сиваков Даниил", "https://vk.com/blanker_bat"),
+                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666")
+                        }
+                    });
+            
                 }
             }
             public static InlineKeyboardMarkup newDisc
