@@ -1,4 +1,4 @@
-﻿//Версия 1.0
+﻿// 1.1
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
