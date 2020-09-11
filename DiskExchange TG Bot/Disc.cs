@@ -15,10 +15,10 @@ namespace DiskExchange_TG_Bot
             get
             {
                 return
-                    $"💿Игра:{name} | {platformNames[platform]}\n" +
+                    $"💿Игра: {name} | {platformNames[platform]}\n" +
                     $"💵Цена: {((price > 0) ? Convert.ToString(price) : "Не указана")}\n" + (exchange != "" ?
                     $"🔄Обмен на: {exchange}\n" : "") +
-                    $"📍Расположение:{location}";
+                    $"📍Расположение: {location}";
             }
         }
 
@@ -33,11 +33,12 @@ namespace DiskExchange_TG_Bot
             photoId = "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
             exchange = "";
             location = "Минск";
+            name = "Безымянная игра";
             userId = user;
         }
 
         public void SetPhoto(string fileId) { photoId = fileId; }
-        public void SetPrice(int p) { price = p; }
+        public void SetPrice(double p) { price = p; }
         public void SetExchange(string e) { exchange = e; }
         public void SetPlatform(byte b) { platform = b; }
         public void SetName(string n) { name = n; }
