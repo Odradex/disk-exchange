@@ -73,10 +73,10 @@ namespace DiskExchange_TG_Bot
                 get
                 {
                     string uploadPhoto = "Загрузить фото";
-                    string editName = "Изменить название";
-                    string ps = "PS4";
-                    string xbox = "Xbox";
-                    string switchN = "Switch";
+                    string editName = "Жыве Беларусь";
+                    string ps = $"PS4 {(Program.platform == 0? "🔘": "⚪️")}";
+                    string xbox = $"Xbox {(Program.platform == 1? "🔘": "⚪️")}";
+                    string switchN = $"Switch {(Program.platform == 2? "🔘" : "⚪️")}";
                     string sell = "Продать";
                     string exchange = "Обменять";
                     return new InlineKeyboardMarkup(new[]

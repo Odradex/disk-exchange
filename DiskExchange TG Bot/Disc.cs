@@ -8,7 +8,7 @@ namespace DiskExchange_TG_Bot
     {
         private string[] platformNames = {"PS4","Xbox One","Swtich"};
         int userId; //User id
-        string photoId; //file_id for disk photo
+        public string photoId; //file_id for disk photo
 
         public string message //Text for the disk message. Generates automaticly, read-only
         {
@@ -24,7 +24,7 @@ namespace DiskExchange_TG_Bot
 
         string name; //Name of the game
         double price; //Game price. If set to 0, price will not display in the message
-        byte platform; //Game platform (1-PS4 2-XONE 3-SWITCH)
+        byte platform; //Game platform (0-PS4 1-XONE 2-SWITCH)
         string exchange; //Games that seller wants to exchange for. If set to null, will not display
         string location; //Seller city
 

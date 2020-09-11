@@ -1,4 +1,4 @@
-﻿// 1.3
+﻿// 1.4
 using System;
 using Telegram.Bot;
 using Telegram.Bot.Requests;
@@ -8,8 +8,11 @@ namespace DiskExchange_TG_Bot
 {
     class Program
     {
+        public static byte platform = 0;
+        static Disc currentDisk = new Disc(666);
+        static bool expectPhoto = false;
+        static int messageAwaitingPhotoId;
         private static ITelegramBotClient bot;
-        private const string placeholderImageId = "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
         static void Main(string[] args)
         {
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(60)};
@@ -21,11 +24,46 @@ namespace DiskExchange_TG_Bot
             Console.ReadKey();
         }
 
-        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        private static async void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
             var data = e.CallbackQuery.Data;
             var message = e.CallbackQuery.Message;
-            Console.WriteLine("query recived:" + data);
+
+            Console.WriteLine($"Recived query from user {e.CallbackQuery.From.Username} ({e.CallbackQuery.From.Id}): " + data);
+            
+            switch (data)
+            {
+                default:
+                    return;
+                case "Загрузить фото":
+                    expectPhoto = true;
+                    messageAwaitingPhotoId = message.MessageId;
+                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                        "Отправьте фото в следующем сообщении.", true);
+                    return;
+                case "PS4 ⚪️":
+                    platform = 0;
+                    currentDisk.SetPlatform(0);
+                    break;
+                case "Xbox ⚪️":
+                    platform = 1;
+                    currentDisk.SetPlatform(1);
+                    break;
+                case "Switch ⚪️":
+                    platform = 2;
+                    currentDisk.SetPlatform(2);
+                    break;
+                case "Изменить название":
+                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id, 
+                        "ОБНАРУЖЕНО НАЦИОНАЛИСТИЧЕСКОЕ ВЫСКАЗЫВАНИЕ\n\n" +
+                        "ОСТАВАЙТЕСЬ НА МЕСТЕ, ОТРЯД ОМОН УЖЕ ВЫЕХАЛ", true);
+                    return;
+            }
+
+            await bot.EditMessageCaptionAsync(message.Chat.Id,
+                message.MessageId,
+                caption: currentDisk.message,
+                replyMarkup: Replies.disc.diskKeyboard);
         }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
@@ -34,9 +72,22 @@ namespace DiskExchange_TG_Bot
             var message = e.Message;
             Console.WriteLine($"Recived message from user {message.From.FirstName} : {message.From.Username} ({message.From.Id}): " + text);
 
-            Disc currentDisk = new Disc(message.From.Id);
-            await bot.SendTextMessageAsync(message.From.Id, currentDisk.message);
+            if((message.Photo != null) && (expectPhoto == true))
+            {
+                string photo = message.Photo[message.Photo.Length - 1].FileId;
+                currentDisk.SetPhoto(photo);
 
+                await bot.EditMessageMediaAsync(
+                    chatId: message.Chat.Id,
+                    messageId: messageAwaitingPhotoId,
+                    media: new Telegram.Bot.Types.InputMediaPhoto(photo));
+                await bot.EditMessageCaptionAsync(message.Chat.Id,
+                    messageAwaitingPhotoId,
+                    caption: currentDisk.message,
+                    replyMarkup: Replies.disc.diskKeyboard);
+
+                expectPhoto = false;
+            }
             switch (message.Text)
             {
                 default:
@@ -69,8 +120,9 @@ namespace DiskExchange_TG_Bot
                     break;
 
                 case "Товар":
-                    await bot.SendTextMessageAsync(message.Chat.Id, "Создание нового товара...", 
-                        replyMarkup: Replies.disc.diskKeyboard);
+                    await bot.SendPhotoAsync(message.Chat.Id, currentDisk.photoId, 
+                        replyMarkup: Replies.disc.diskKeyboard,
+                        caption: currentDisk.message);
                     break;
 
                 case "/poll":
