@@ -1,8 +1,9 @@
-﻿// 1.4
+﻿// 1.7
 using System;
+using System.Drawing;
 using Telegram.Bot;
-using Telegram.Bot.Requests;
-using Telegram.Bot.Types.ReplyMarkups;
+using Pastel;
+using System.Data.SQLite;
 
 namespace DiskExchange_TG_Bot
 {
@@ -17,6 +18,7 @@ namespace DiskExchange_TG_Bot
         static bool expextExchange = false;
         public static bool diskExchangeable = false;
 
+        static Logger log = new Logger();
 
         static int diskMessageId;
         private static ITelegramBotClient bot;
@@ -25,19 +27,27 @@ namespace DiskExchange_TG_Bot
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(20)};
             bot.OnMessage += Bot_OnMessage;
             bot.OnCallbackQuery += Bot_OnCallbackQuery;
+            Database db = new Database();
+
+            Console.Write($"2/2: Starting @DiskExchangeBot... ".Pastel(Color.Yellow));
+            Console.Beep();
+
             try
             {
                 bot.StartReceiving();
-                Console.WriteLine($"Starting bot {bot.GetMeAsync().Result}...");
-                Console.ReadKey();
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("\nStartup failed! Error message: " + e.Message.Pastel(Color.Red));
                 Console.ReadKey();
                 return;
             }
-            
+            Console.WriteLine("[READY]\n");
+
+            Console.WriteLine(">ALL SYSTEMS READY\n>Welcome, admin\n");
+            Console.CursorVisible = false;
+            Console.Beep();
+            Console.ReadLine();
         }
 
         private static async void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
@@ -45,8 +55,8 @@ namespace DiskExchange_TG_Bot
             var data = e.CallbackQuery.Data;
             var message = e.CallbackQuery.Message;
 
-            Console.WriteLine($"Recived query from user {e.CallbackQuery.From.Username} ({e.CallbackQuery.From.Id}): " + data);
-            
+            log.Query(e);
+
             switch (data)
             {
                 default:
@@ -105,35 +115,35 @@ namespace DiskExchange_TG_Bot
             { 
                 return;
             }
-            
         }
-
+        
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
             var text = e.Message.Text;
             var message = e.Message;
-            Console.WriteLine($"Recived message from user {message.From.FirstName} : {message.From.Username} ({message.From.Id}): " + text);
+            log.Message(e);
 
-            if((message.Photo != null) && (expectPhoto == true))
-            {
-                string photo = message.Photo[message.Photo.Length - 1].FileId;
-                currentDisk.SetPhoto(photo);
-                
-                await bot.EditMessageMediaAsync(
-                    chatId: message.Chat.Id,
-                    messageId: diskMessageId,
-                    media: new Telegram.Bot.Types.InputMediaPhoto(photo));
-                await bot.EditMessageCaptionAsync(message.Chat.Id,
-                    diskMessageId,
-                    caption: currentDisk.message,
-                    replyMarkup: Replies.disc.diskKeyboard);
-
-                expectPhoto = false;
-            }
+            
             switch (message.Text)
             {
                 default:
-                    if (expextName == true)
+                    if ((message.Photo != null) && (expectPhoto == true))
+                    {
+                        string photo = message.Photo[message.Photo.Length - 1].FileId;
+                        currentDisk.SetPhoto(photo);
+
+                        await bot.EditMessageMediaAsync(
+                            chatId: message.Chat.Id,
+                            messageId: diskMessageId,
+                            media: new Telegram.Bot.Types.InputMediaPhoto(photo));
+                        await bot.EditMessageCaptionAsync(message.Chat.Id,
+                            diskMessageId,
+                            caption: currentDisk.message,
+                            replyMarkup: Replies.disc.diskKeyboard);
+
+                        expectPhoto = false;
+                    }
+                    else if (expextName == true)
                     {
                         currentDisk.SetName(message.Text);
                         await bot.EditMessageCaptionAsync(message.Chat.Id,
@@ -142,7 +152,7 @@ namespace DiskExchange_TG_Bot
                             replyMarkup: Replies.disc.diskKeyboard);
                         expextName = false;
                     }
-                    if (expextPrice == true)
+                    else if (expextPrice == true)
                     {
                         currentDisk.SetPrice(Convert.ToDouble(message.Text));
                         await bot.EditMessageCaptionAsync(message.Chat.Id,
@@ -151,7 +161,7 @@ namespace DiskExchange_TG_Bot
                             replyMarkup: Replies.disc.diskKeyboard);
                         expextPrice = false;
                     }
-                    if (expextExchange == true)
+                    else if (expextExchange == true)
                     {
                         diskExchangeable = true;
                         currentDisk.SetExchange(message.Text);
@@ -161,8 +171,11 @@ namespace DiskExchange_TG_Bot
                             replyMarkup: Replies.disc.diskKeyboard);
                         expextExchange = false;
                     }
+                    else Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
+                    Console.WriteLine();
+
                     await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);
-                    break;
+                    return;
 
                 case "/start":
                     await bot.SendTextMessageAsync(message.From.Id,$"Привет {message.From.Username}, это бот по обмену дисками!");
@@ -208,6 +221,7 @@ namespace DiskExchange_TG_Bot
                 case "TEST":
                     break;
             }
+            Console.WriteLine();
         }
     }
 }
