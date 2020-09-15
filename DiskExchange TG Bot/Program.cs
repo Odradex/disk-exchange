@@ -1,4 +1,4 @@
-﻿// 1.7
+﻿// 1.8
 using System;
 using System.Drawing;
 using Telegram.Bot;

@@ -36,12 +36,11 @@ namespace DiskExchange_TG_Bot
             name = "Безымянная игра";
             userId = user;
         }
-
         public void SetPhoto(string fileId) { photoId = fileId; }
         public void SetPrice(double p) { price = p; }
         public void SetExchange(string e) { exchange = e; }
         public void SetPlatform(byte b) { platform = b; }
         public void SetName(string n) { name = n; }
-        
+
     }
 }
