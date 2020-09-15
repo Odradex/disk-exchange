@@ -24,11 +24,12 @@ namespace DiskExchange_TG_Bot
         private static ITelegramBotClient bot;
         static void Main(string[] args)
         {
+            Database db = new Database();
+            db.NewDisc(25565, 712);
+            
             bot = new TelegramBotClient("1299381797:AAF58uk3gqiSt9pkILwJ8970UXo2t_0_brQ") { Timeout = TimeSpan.FromSeconds(20)};
             bot.OnMessage += Bot_OnMessage;
             bot.OnCallbackQuery += Bot_OnCallbackQuery;
-            Database db = new Database();
-
             Console.Write($"2/2: Starting @DiskExchangeBot... ".Pastel(Color.Yellow));
             Console.Beep();
 
@@ -127,51 +128,63 @@ namespace DiskExchange_TG_Bot
             switch (message.Text)
             {
                 default:
-                    if ((message.Photo != null) && (expectPhoto == true))
+                    try
                     {
-                        string photo = message.Photo[message.Photo.Length - 1].FileId;
-                        currentDisk.SetPhoto(photo);
+                        if ((message.Photo != null) && (expectPhoto == true))
+                        {
+                            string photo = message.Photo[message.Photo.Length - 1].FileId;
+                            currentDisk.SetPhoto(photo);
 
-                        await bot.EditMessageMediaAsync(
-                            chatId: message.Chat.Id,
-                            messageId: diskMessageId,
-                            media: new Telegram.Bot.Types.InputMediaPhoto(photo));
-                        await bot.EditMessageCaptionAsync(message.Chat.Id,
-                            diskMessageId,
-                            caption: currentDisk.message,
-                            replyMarkup: Replies.disc.diskKeyboard);
+                            await bot.EditMessageMediaAsync(
+                                chatId: message.Chat.Id,
+                                messageId: diskMessageId,
+                                media: new Telegram.Bot.Types.InputMediaPhoto(photo));
+                            await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                diskMessageId,
+                                caption: currentDisk.message,
+                                replyMarkup: Replies.disc.diskKeyboard);
 
+                            expectPhoto = false;
+                        }
+                        else if (expextName == true)
+                        {
+                            currentDisk.SetName(message.Text);
+                            await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                diskMessageId,
+                                caption: currentDisk.message,
+                                replyMarkup: Replies.disc.diskKeyboard);
+                            expextName = false;
+                        }
+                        else if (expextPrice == true)
+                        {
+                            currentDisk.SetPrice(Convert.ToDouble(message.Text));
+                            await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                diskMessageId,
+                                caption: currentDisk.message,
+                                replyMarkup: Replies.disc.diskKeyboard);
+                            expextPrice = false;
+                        }
+                        else if (expextExchange == true)
+                        {
+                            diskExchangeable = true;
+                            currentDisk.SetExchange(message.Text);
+                            await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                diskMessageId,
+                                caption: currentDisk.message,
+                                replyMarkup: Replies.disc.diskKeyboard);
+                            expextExchange = false;
+                        }
+                        else Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
+                    }
+                    catch (Telegram.Bot.Exceptions.MessageIsNotModifiedException e1)
+                    {
                         expectPhoto = false;
-                    }
-                    else if (expextName == true)
-                    {
-                        currentDisk.SetName(message.Text);
-                        await bot.EditMessageCaptionAsync(message.Chat.Id,
-                            diskMessageId,
-                            caption: currentDisk.message,
-                            replyMarkup: Replies.disc.diskKeyboard);
-                        expextName = false;
-                    }
-                    else if (expextPrice == true)
-                    {
-                        currentDisk.SetPrice(Convert.ToDouble(message.Text));
-                        await bot.EditMessageCaptionAsync(message.Chat.Id,
-                            diskMessageId,
-                            caption: currentDisk.message,
-                            replyMarkup: Replies.disc.diskKeyboard);
-                        expextPrice = false;
-                    }
-                    else if (expextExchange == true)
-                    {
-                        diskExchangeable = true;
-                        currentDisk.SetExchange(message.Text);
-                        await bot.EditMessageCaptionAsync(message.Chat.Id,
-                            diskMessageId,
-                            caption: currentDisk.message,
-                            replyMarkup: Replies.disc.diskKeyboard);
                         expextExchange = false;
+                        expextName = false;
+                        expextPrice = false;
+                        log.Error(e1.Message);
                     }
-                    else Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
+                    
                     Console.WriteLine();
 
                     await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);

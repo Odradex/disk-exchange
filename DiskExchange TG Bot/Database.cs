@@ -12,7 +12,7 @@ namespace DiskExchange_TG_Bot
 {
     class Database
     {
-        SQLiteConnection connection;
+        static SQLiteConnection connection;
         SQLiteCommand cmd;
         SQLiteDataReader rdr;
         public Database()
@@ -32,6 +32,7 @@ namespace DiskExchange_TG_Bot
         }
         public int NewDisc(int userId, int EditMessageId)
         {
+            cmd = new SQLiteCommand("INSERT INTO disks", connection);
             return 0;
         }
         public void SetPhoto(int UserId, string fileId)

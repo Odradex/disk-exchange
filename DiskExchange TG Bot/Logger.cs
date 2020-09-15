@@ -50,5 +50,9 @@ namespace DiskExchange_TG_Bot
             Console.WriteLine($"[{DateTime.Now}][{query.From.Username} - {query.From.Id}][ QUERY ]: ".Pastel(Color.DarkTurquoise) + query.Data.Pastel(Color.Turquoise));
         }
 
+        internal void Error(string message)
+        {
+            Console.Write($"\n[{DateTime.Now}][ ERROR ]: {message}".Pastel(Color.Red));
+        }
     }
 }
