@@ -20,6 +20,24 @@ namespace DiskExchange_TG_Bot
                         new[] {
                             new KeyboardButton("Избранное 🌟"),
                             new KeyboardButton("Помощь ❓"),
+                        },
+                    },
+                        resizeKeyboard: true);
+                }
+            }
+            public static ReplyKeyboardMarkup profile
+            {
+                get
+                {
+                    return new ReplyKeyboardMarkup(new[]
+                                        {
+                        new[]
+                        {
+                            new KeyboardButton("Добавить товар 💿"),
+                        },
+                        new[]
+                        {
+                             new KeyboardButton("Назад 🔙")
                         }
                     },
                         resizeKeyboard: true);
@@ -32,8 +50,11 @@ namespace DiskExchange_TG_Bot
                     {
                         new[]
                         {  
-                            new KeyboardButton("Контакты"),
-                            new KeyboardButton("Назад")
+                            new KeyboardButton("Контакты 📱"),
+                        },
+                        new[]
+                        {
+                             new KeyboardButton("Назад 🔙")
                         }
                     },
                         resizeKeyboard: true);
@@ -78,7 +99,7 @@ namespace DiskExchange_TG_Bot
                     string xbox = $"Xbox {(Program.platform == 1? "🔘": "⚪️")}";
                     string switchN = $"Switch {(Program.platform == 2? "🔘" : "⚪️")}";
                     string sell = "Указать цену";
-                    string exchange = Program.diskExchangeable? "Убрать обмен": "Обмен";
+                    string exchange = Program.discExchangeable? "Убрать обмен": "Обмен";
                     return new InlineKeyboardMarkup(new[]
                     {
                         new[]

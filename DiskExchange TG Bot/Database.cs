@@ -13,13 +13,13 @@ namespace DiskExchange_TG_Bot
     class Database
     {
         SQLiteConnection connection;
-        SQLiteCommand cmd;
-        SQLiteDataReader rdr;
+        //SQLiteCommand cmd;
+        //SQLiteDataReader rdr;
         public Database()
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(System.Drawing.Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -29,6 +29,14 @@ namespace DiskExchange_TG_Bot
             //cmd = new SQLiteCommand("INSERT INTO disks(name) VALUES('test');", connection);
             //cmd.ExecuteNonQuery();
             //rdr = cmd.ExecuteReader();
+        }
+       
+        public string GetMessage
+        {
+            get
+            {
+                return "lol";
+            }
         }
         public int NewDisc(int userId, int EditMessageId)
         {
