@@ -55,3 +55,14 @@ X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\
 X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.0\SQLite.Interop.dll
 X:\Git Repos\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.1\SQLite.Interop.dll
 X:\Git Repos\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CoreCompileInputs.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\Pastel.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\System.Data.SQLite.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\netstandard2.0\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\netstandard2.1\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\netstandard2.0\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\netstandard2.1\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\netstandard2.0\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\netstandard2.1\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.0\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.1\SQLite.Interop.dll
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache
