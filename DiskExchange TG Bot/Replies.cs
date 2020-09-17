@@ -75,57 +75,42 @@ namespace DiskExchange_TG_Bot
             
                 }
             }
-            public static InlineKeyboardMarkup Disc
+        }
+        static public InlineKeyboardMarkup editKeyboard(string platform)
+        {
+            string uploadPhoto = "Загрузить фото";
+            string editName = "Изменить название";
+            string ps = $"PS4 {(platform == "PS4" ? "🔘" : "⚪️")}";
+            string xbox = $"Xbox {(platform == "Xbox" ? "🔘" : "⚪️")}";
+            string switchN = $"Switch {(platform == "Switch" ? "🔘" : "⚪️")}";
+            string sell = "Указать цену";
+            string exchange = Program.discExchangeable ? "Убрать обмен" : "Обмен";
+            return new InlineKeyboardMarkup(new[]
             {
-                get
-                {
-                    return new InlineKeyboardMarkup(new[] {
-                        new[]{
-                            InlineKeyboardButton.WithCallbackData("Ввести название ")
-                        }
-                    });
-                }
-            }
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(uploadPhoto)
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(editName)
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(ps),
+                        InlineKeyboardButton.WithCallbackData(xbox),
+                        InlineKeyboardButton.WithCallbackData(switchN)
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(sell),
+                        InlineKeyboardButton.WithCallbackData(exchange)
+                    }
+                });
         }
         public struct disc
         {
-            public static InlineKeyboardMarkup diskKeyboard
-            {
-                get
-                {
-                    string uploadPhoto = "Загрузить фото";
-                    string editName = "Изменить название";
-                    string ps = $"PS4 {(Program.platform == 0? "🔘": "⚪️")}";
-                    string xbox = $"Xbox {(Program.platform == 1? "🔘": "⚪️")}";
-                    string switchN = $"Switch {(Program.platform == 2? "🔘" : "⚪️")}";
-                    string sell = "Указать цену";
-                    string exchange = Program.discExchangeable? "Убрать обмен": "Обмен";
-                    return new InlineKeyboardMarkup(new[]
-                    {
-                        new[]
-                        {
-                            InlineKeyboardButton.WithCallbackData(uploadPhoto)
-                        },
-                        new[]
-                        {
-                            InlineKeyboardButton.WithCallbackData(editName)
-                        },
-                        new[]
-                        {
-                            InlineKeyboardButton.WithCallbackData(ps),
-                            InlineKeyboardButton.WithCallbackData(xbox),
-                            InlineKeyboardButton.WithCallbackData(switchN)
-                        },
-                        new[]
-                        {
-                            InlineKeyboardButton.WithCallbackData(sell),
-                            InlineKeyboardButton.WithCallbackData(exchange)
-                        }
-
-
-                    });
-                }
-            }
+            
         }
 
     }

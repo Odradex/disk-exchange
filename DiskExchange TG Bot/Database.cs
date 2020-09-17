@@ -3,11 +3,6 @@ using System.Data.SQLite;
 using System.Drawing;
 using Pastel;
 
-/*
- cmd.ExecuteNonQueryAsync(); - выполнить команду
- 
- */
-
 namespace DiskExchange_TG_Bot
 {
     class Database
@@ -21,15 +16,29 @@ namespace DiskExchange_TG_Bot
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
             connection = new SQLiteConnection(path1);
-            Console.Write("1/2: Connecting to Database... ".Pastel(System.Drawing.Color.Yellow));
+            Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
             Console.WriteLine("[READY]");
-
-
-            //cmd = new SQLiteCommand("INSERT INTO disks(name) VALUES('test');", connection);
-            //cmd.ExecuteNonQuery();
-            //rdr = cmd.ExecuteReader();
+        }
+        public void SetAwaitInfoType(int userId, int type)
+        {
+            cmd = new SQLiteCommand($"UPDATE users SET awaitInfoType = {type} WHERE id = {userId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
+        public int GetAwaitInfoType(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM users WHERE id = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(5);
+        }
+        public string GetPlatform(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT platform FROM disks WHERE id = (SELECT editDiscId FROM users WHERE id = {userId})", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetString(0);
         }
         public int NewDisc(int Id)
         {
@@ -58,7 +67,6 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
-
         public void SetPrice(double price, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -100,7 +108,7 @@ namespace DiskExchange_TG_Bot
             rdr = cmd.ExecuteReader();
             rdr.Read();
             return $"💿Игра: {rdr.GetString(1)} | {rdr.GetString(2)}\n" +
-                    $"💵Цена: {((Convert.ToDouble(rdr.GetString(4)) > 0) ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
+                    $"💵Цена: {((Convert.ToDouble(rdr.GetString(4)) > 0)  ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
                     $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
                     $"📍Расположение: {rdr.GetString(7)}";
         }

@@ -1,4 +1,4 @@
-﻿// 1.9
+﻿// 1.10
 using System;
 using System.Drawing;
 using Telegram.Bot;
@@ -10,18 +10,18 @@ namespace DiskExchange_TG_Bot
 {
     class Program
     {
-        public static byte platform = 0;
-        //static Disc currentdisc = new Disc(666);
         static Logger log = new Logger();
         static Database db = new Database();
-        struct expect
-        {
-            public static bool Photo = false;
-            public static bool Name = false;
-            public static bool Price = false;
-            public static bool Exchange = false;
-            public static bool Location = false;
-        }
+        
+        enum awaitInfoType : int
+        { 
+            none = 0,
+            photo = 1,
+            name = 2,
+            price = 3,
+            exchange = 4,
+            location = 5
+        };
         
         public static bool discExchangeable = false;
 
@@ -49,7 +49,6 @@ namespace DiskExchange_TG_Bot
 
             Console.WriteLine(">ALL SYSTEMS READY\n>Welcome, admin\n");
             Console.CursorVisible = false;
-            Console.Beep();
             Console.ReadLine();
         }
 
@@ -66,16 +65,13 @@ namespace DiskExchange_TG_Bot
                     return;
               
                 case "PS4 ⚪️":
-                    platform = 0; 
-                    db.SetPlatform(platform, e.CallbackQuery.From.Id, true);
+                    db.SetPlatform(0, e.CallbackQuery.From.Id, true);
                     break;
                 case "Xbox ⚪️":
-                    platform = 1;
-                    db.SetPlatform(platform, e.CallbackQuery.From.Id, true);
+                    db.SetPlatform(1, e.CallbackQuery.From.Id, true);
                     break;
                 case "Switch ⚪️":
-                    platform = 2;
-                    db.SetPlatform(platform, e.CallbackQuery.From.Id, true);
+                    db.SetPlatform(2, e.CallbackQuery.From.Id, true);
                     break;
                 case "Убрать обмен":
                     db.SetExchange("", e.CallbackQuery.From.Id, true);
@@ -85,37 +81,37 @@ namespace DiskExchange_TG_Bot
                     await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                         "Отправьте название игры в следующем сообщении.", true);
                     discMessageId = message.MessageId;
-                    expect.Name = true;
+                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.name);
                     return;
                 case "Указать цену":
                     await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                         "Отправьте цену игры в следующем сообщении.", true);
                     discMessageId = message.MessageId;
-                    expect.Price = true;
+                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.price);
                     return;
                 case "Обмен":
                     await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                         "Отправьте названия желаемых игр в следующем сообщении.", true);
                     discMessageId = message.MessageId;
-                    expect.Exchange = true;
+                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.exchange);
                     return;
                 case "Загрузить фото":
                     await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                         "Отправьте фотогрфию в следующем сообщении.", true);
                     discMessageId = message.MessageId;
-                    expect.Photo = true;
-                    return;
-
+                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.photo);
+                    return; 
             }
             try
             {
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
                 message.MessageId,
                 caption: db.GetCaption(e.CallbackQuery.From.Id, true),
-                replyMarkup: Replies.disc.diskKeyboard);
+                replyMarkup: Replies.editKeyboard(db.GetPlatform(e.CallbackQuery.From.Id)));
             }
-            catch (Telegram.Bot.Exceptions.MessageIsNotModifiedException)
-            { 
+            catch (MessageIsNotModifiedException e3)
+            {
+                log.Error(e3.Message);
                 return;
             }
         }
@@ -125,80 +121,75 @@ namespace DiskExchange_TG_Bot
             var message = e.Message;
             log.Message(e);
 
-            
             switch (message.Text)
             {
                 default:
                     try
                     {
-                        if ((message.Photo != null) && (expect.Photo == true))
+                        switch (db.GetAwaitInfoType(message.From.Id))
                         {
-                            expect.Photo = false;
-                            string photo = message.Photo[message.Photo.Length - 1].FileId;
-                            db.SetPhoto(photo, message.From.Id, true);
-                            await bot.EditMessageMediaAsync(
-                                chatId: message.Chat.Id,
-                                messageId: discMessageId,
-                                media: new Telegram.Bot.Types.InputMediaPhoto(photo));
-                            await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                discMessageId,
-                                caption: db.GetCaption(message.From.Id, true),
-                                replyMarkup: Replies.disc.diskKeyboard);
+                            case 0:
+                                break;
+                            case (int)awaitInfoType.name:
+                                db.SetName(text, message.From.Id, true);
+                                await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                    discMessageId,
+                                    caption: db.GetCaption(message.From.Id, true),
+                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                break;
+                            case (int)awaitInfoType.price:
+                                db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
+                                await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                    discMessageId,
+                                    caption: db.GetCaption(message.From.Id, true),
+                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                break;
+                            case (int)awaitInfoType.exchange:
+                                discExchangeable = true;
+                                db.SetExchange(text, message.From.Id, true);
+                                await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                    discMessageId,
+                                    caption: db.GetCaption(message.From.Id, true),
+                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                break;
+                            case (int)awaitInfoType.location:
+                                db.NewUser(message.From.Id, text);
+                                await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
+                                    replyMarkup: Replies.keyboards.main);
+                                Console.WriteLine();
+                                return;
+                            case (int)awaitInfoType.photo:
+                                if (message.Photo == null)
+                                    break;
+                                string photo = message.Photo[message.Photo.Length - 1].FileId;
+                                db.SetPhoto(photo, message.From.Id, true);
+                                await bot.EditMessageMediaAsync(
+                                    chatId: message.Chat.Id,
+                                    messageId: discMessageId,
+                                    media: new Telegram.Bot.Types.InputMediaPhoto(photo));
+                                await bot.EditMessageCaptionAsync(message.Chat.Id,
+                                    discMessageId,
+                                    caption: db.GetCaption(message.From.Id, true),
+                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                break;
+                            default:
+                                Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
+                                break;
                         }
-                        else if (expect.Name == true)
-                        {
-                            expect.Name = false;
-                            db.SetName(text, message.From.Id, true);
-                            await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                discMessageId,
-                                caption: db.GetCaption(message.From.Id, true),
-                                replyMarkup: Replies.disc.diskKeyboard);
-                        }
-                        else if (expect.Price == true)
-                        {
-                            expect.Price = false;
-                            db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
-                            await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                discMessageId,
-                                caption: db.GetCaption(message.From.Id, true),
-                                replyMarkup: Replies.disc.diskKeyboard);
-                        }
-                        else if (expect.Exchange == true)
-                        {
-                            expect.Exchange = false;
-                            discExchangeable = true;
-                            db.SetExchange(text, message.From.Id, true);
-                            await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                discMessageId,
-                                caption: db.GetCaption(message.From.Id, true),
-                                replyMarkup: Replies.disc.diskKeyboard);
-                        }
-                        else if (expect.Location == true)
-                        {
-                            expect.Location = false;
-                            db.NewUser(message.From.Id, text);
-                            await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
-                                replyMarkup: Replies.keyboards.main);
-                            Console.WriteLine();
-                            return;
-                        }
-                        else Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
                         Console.WriteLine();
-
                     }
                     catch (MessageIsNotModifiedException e1)
                     {
                         log.Error(e1.Message);
                         return;
                     }
-                    
                     await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);
                     return;
 
                 case "/start":
                     await bot.SendTextMessageAsync(message.From.Id,$"Привет {message.From.Username}, это бот по обмену дисками!");
                     await bot.SendTextMessageAsync(message.From.Id,$"Пожалуйста, введите ваш город проживания:");
-                    expect.Location = true;
+                    db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.location);
                     break;
                     
                 case "/keyboard":
@@ -225,7 +216,7 @@ namespace DiskExchange_TG_Bot
                     db.NewDisc(message.From.Id);
                     var temp = await bot.SendPhotoAsync(message.Chat.Id, "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA", 
                         caption: db.GetCaption(message.From.Id, true),
-                        replyMarkup: Replies.disc.diskKeyboard);
+                        replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                     db.SetEditMessageId(message.From.Id, temp.MessageId);
                     break;
                 case "Поиск 🔎":
