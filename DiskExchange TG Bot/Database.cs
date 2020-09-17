@@ -15,6 +15,7 @@ namespace DiskExchange_TG_Bot
         static SQLiteConnection connection;
         SQLiteCommand cmd;
         SQLiteDataReader rdr;
+        string[] platformNames = { "PS4", "Xbox", "Switch" };
         public Database()
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
@@ -30,38 +31,78 @@ namespace DiskExchange_TG_Bot
             //cmd.ExecuteNonQuery();
             //rdr = cmd.ExecuteReader();
         }
-        public int NewDisc(int userId, int EditMessageId)
+        public int NewDisc(int Id)
         {
-            cmd = new SQLiteCommand("INSERT INTO disks", connection);
+            cmd = new SQLiteCommand($"INSERT INTO disks(sellerId, location) VALUES({Id}, (SELECT location FROM users WHERE id = {Id}))", connection);
+            cmd.ExecuteNonQueryAsync();
+            cmd = new SQLiteCommand($"UPDATE users SET editDiscId = (SELECT last_insert_rowid() FROM disks) WHERE id = {Id}", connection);
+            cmd.ExecuteNonQueryAsync();
             return 0;
         }
-        public void SetPhoto(int UserId, string fileId)
+        public void NewUser(int userId, string loc)
         {
+            cmd = new SQLiteCommand($"INSERT INTO users(id, location) VALUES {userId}, '{loc}'", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
+        private int GetDiscId(int Id)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM users WHERE id = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(4);
+        }
+        public void SetPhoto(string fileId, int discId, bool getIdFromUser = false)
+        {
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
 
-        }
-        public void SetPrice(int UserId, double price)
+        public void SetPrice(double price, int discId, bool getIdFromUser = false)
         {
-
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET price = {price} WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
         }
-        public void SetExchange(int UserId, string e)
+        public void SetExchange(string e, int discId, bool getIdFromUser = false)
         {
-
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET exchange = '{e}' WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
         }
-        public void SetPlatform(int UserId, byte b)
+        public void SetPlatform(byte b, int discId, bool getIdFromUser = false)
         {
-
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET platform = '{platformNames[b]}' WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
         }
-        public void SetName(int UserId, string n)
+        public void SetName(string n, int discId, bool getIdFromUser = false)
         {
-
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET name = '{n}' WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
         }
-        public int GetEditMessageId(int UserId)
+        public void SetEditMessageId(int userId, int messageId)
         {
-            return 0;
+            cmd = new SQLiteCommand($"UPDATE users SET editMessageId = {messageId} WHERE id = {userId}", connection);
+            cmd.ExecuteNonQueryAsync();
         }
-        public string GetCaption(int UserId)
+        public string GetCaption(int Id, bool getIdFromUser = false)
         {
-            return "temp";
+            if (getIdFromUser)
+                Id = GetDiscId(Id);
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE id = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.Read();
+            return $"💿Игра: {rdr.GetString(1)} | {rdr.GetString(2)}\n" +
+                    $"💵Цена: {((Convert.ToDouble(rdr.GetString(4)) > 0) ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
+                    $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
+                    $"📍Расположение: {rdr.GetString(7)}";
         }
     }
 }
