@@ -215,6 +215,9 @@ namespace DiskExchange_TG_Bot
                     await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
                         replyMarkup: Replies.keyboards.profile);
                     break;
+                case "Мои товары 💿":
+                    await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
+                    break;
                 case "Избранное 🌟":
                     break;
                 case "TEST":

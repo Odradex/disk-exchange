@@ -14,8 +14,8 @@ namespace DiskExchange_TG_Bot
         public Database()
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
-            string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            string path2 = @"URI=file:E:\DiskExchangeDB.db";
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -77,6 +77,11 @@ namespace DiskExchange_TG_Bot
             cmd.ExecuteNonQueryAsync();
         }
 
+        internal bool DeleteExchangeIfExists(int id, bool a)
+        {
+            return a;
+        }
+
         internal bool GetExchange(int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -121,6 +126,14 @@ namespace DiskExchange_TG_Bot
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
             return rdr.GetInt32(0);
+        }
+        public string GetUserDisks(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {userId}",connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            string temp = rdr.GetString(1) + rdr.GetString(2) + rdr.GetString(4);
+           return temp;
         }
         public string GetCaption(int Id, bool getIdFromUser = false)
         {

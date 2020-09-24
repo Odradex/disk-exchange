@@ -34,6 +34,7 @@ namespace DiskExchange_TG_Bot
                         new[]
                         {
                             new KeyboardButton("Добавить товар 💿"),
+                            new KeyboardButton("Мои товары 💿")
                         },
                         new[]
                         {
