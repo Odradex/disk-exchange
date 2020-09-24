@@ -22,10 +22,7 @@ namespace DiskExchange_TG_Bot
             exchange = 4,
             location = 5
         };
-        
-        public static bool discExchangeable = false;
 
-        static int discMessageId;
         private static ITelegramBotClient bot;
         static void Main(string[] args)
         {
@@ -59,51 +56,45 @@ namespace DiskExchange_TG_Bot
 
             log.Query(e);
 
-            switch (data)
-            {
-                default:
-                    return;
-              
-                case "PS4 ⚪️":
-                    db.SetPlatform(0, e.CallbackQuery.From.Id, true);
-                    break;
-                case "Xbox ⚪️":
-                    db.SetPlatform(1, e.CallbackQuery.From.Id, true);
-                    break;
-                case "Switch ⚪️":
-                    db.SetPlatform(2, e.CallbackQuery.From.Id, true);
-                    break;
-                case "Убрать обмен":
-                    db.SetExchange("", e.CallbackQuery.From.Id, true);
-                    discExchangeable = false;
-                    break;
-                case "Изменить название":
-                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
-                        "Отправьте название игры в следующем сообщении.", true);
-                    discMessageId = message.MessageId;
-                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.name);
-                    return;
-                case "Указать цену":
-                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
-                        "Отправьте цену игры в следующем сообщении.", true);
-                    discMessageId = message.MessageId;
-                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.price);
-                    return;
-                case "Обмен":
-                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
-                        "Отправьте названия желаемых игр в следующем сообщении.", true);
-                    discMessageId = message.MessageId;
-                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.exchange);
-                    return;
-                case "Загрузить фото":
-                    await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
-                        "Отправьте фотогрфию в следующем сообщении.", true);
-                    discMessageId = message.MessageId;
-                    db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.photo);
-                    return; 
-            }
             try
             {
+                switch (data)
+                {
+                    default:
+                        return;
+              
+                    case "PS4 ⚪️":
+                        db.SetPlatform(0, e.CallbackQuery.From.Id, true);
+                        break;
+                    case "Xbox ⚪️":
+                        db.SetPlatform(1, e.CallbackQuery.From.Id, true);
+                        break;
+                    case "Switch ⚪️":
+                        db.SetPlatform(2, e.CallbackQuery.From.Id, true);
+                        break;
+                    case "Изменить название":
+                        await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                            "Отправьте название игры в следующем сообщении.", true);
+                        db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.name);
+                        return;
+                    case "Указать цену":
+                        await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                            "Отправьте цену игры в следующем сообщении.", true);
+                        db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.price);
+                        return;
+                    case "Обмен":
+                        if (db.DeleteExchangeIfExists(e.CallbackQuery.From.Id, true))
+                            break;
+                        await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                            "Отправьте названия желаемых игр в следующем сообщении.", true);
+                        db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.exchange);
+                        return;
+                    case "Загрузить фото":
+                        await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                            "Отправьте фотогрфию в следующем сообщении.", true);
+                        db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.photo);
+                        return; 
+                }
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
                 message.MessageId,
                 caption: db.GetCaption(e.CallbackQuery.From.Id, true),
@@ -133,22 +124,21 @@ namespace DiskExchange_TG_Bot
                             case (int)awaitInfoType.name:
                                 db.SetName(text, message.From.Id, true);
                                 await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    discMessageId,
+                                    db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                                 break;
                             case (int)awaitInfoType.price:
                                 db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
                                 await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    discMessageId,
+                                    db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                                 break;
                             case (int)awaitInfoType.exchange:
-                                discExchangeable = true;
                                 db.SetExchange(text, message.From.Id, true);
                                 await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    discMessageId,
+                                    db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                                 break;
@@ -165,10 +155,10 @@ namespace DiskExchange_TG_Bot
                                 db.SetPhoto(photo, message.From.Id, true);
                                 await bot.EditMessageMediaAsync(
                                     chatId: message.Chat.Id,
-                                    messageId: discMessageId,
+                                    messageId: db.GetEditMessageId(message.From.Id),
                                     media: new Telegram.Bot.Types.InputMediaPhoto(photo));
                                 await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    discMessageId,
+                                    db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                                 break;

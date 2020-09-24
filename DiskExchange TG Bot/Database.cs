@@ -31,6 +31,8 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"SELECT * FROM users WHERE id = {userId}", connection);
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
+            if (rdr.HasRows == false)
+                return 0;
             return rdr.GetInt32(5);
         }
         public string GetPlatform(int userId)
@@ -74,6 +76,19 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET price = {price} WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
+
+        internal bool GetExchange(int discId, bool getIdFromUser = false)
+        {
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET exchange = \"\" WHERE id = {discId} AND exchange != \"\"", connection);
+            cmd.ExecuteNonQueryAsync();
+            cmd = new SQLiteCommand($"SELECT exchange FROM disks WHERE id = {discId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetString(0) == "";
+        }
+
         public void SetExchange(string e, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -99,6 +114,13 @@ namespace DiskExchange_TG_Bot
         {
             cmd = new SQLiteCommand($"UPDATE users SET editMessageId = {messageId} WHERE id = {userId}", connection);
             cmd.ExecuteNonQueryAsync();
+        }
+        public int GetEditMessageId(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT editMessageId FROM users WHERE id = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(0);
         }
         public string GetCaption(int Id, bool getIdFromUser = false)
         {

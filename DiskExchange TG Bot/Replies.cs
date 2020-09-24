@@ -84,7 +84,7 @@ namespace DiskExchange_TG_Bot
             string xbox = $"Xbox {(platform == "Xbox" ? "🔘" : "⚪️")}";
             string switchN = $"Switch {(platform == "Switch" ? "🔘" : "⚪️")}";
             string sell = "Указать цену";
-            string exchange = Program.discExchangeable ? "Убрать обмен" : "Обмен";
+            string exchange = "Обмен";
             return new InlineKeyboardMarkup(new[]
             {
                     new[]
@@ -105,13 +105,12 @@ namespace DiskExchange_TG_Bot
                     {
                         InlineKeyboardButton.WithCallbackData(sell),
                         InlineKeyboardButton.WithCallbackData(exchange)
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Сохранить")
                     }
                 });
         }
-        public struct disc
-        {
-            
-        }
-
     }
 }
