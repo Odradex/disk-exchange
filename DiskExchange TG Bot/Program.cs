@@ -5,6 +5,7 @@ using Telegram.Bot;
 using Pastel;
 using System.Data.SQLite;
 using Telegram.Bot.Exceptions;
+using System.Threading.Tasks;
 
 namespace DiskExchange_TG_Bot
 {
@@ -123,24 +124,15 @@ namespace DiskExchange_TG_Bot
                                 break;
                             case (int)awaitInfoType.name:
                                 db.SetName(text, message.From.Id, true);
-                                await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    db.GetEditMessageId(message.From.Id),
-                                    caption: db.GetCaption(message.From.Id, true),
-                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.price:
                                 db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
-                                await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    db.GetEditMessageId(message.From.Id),
-                                    caption: db.GetCaption(message.From.Id, true),
-                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.exchange:
                                 db.SetExchange(text, message.From.Id, true);
-                                await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    db.GetEditMessageId(message.From.Id),
-                                    caption: db.GetCaption(message.From.Id, true),
-                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.location:
                                 db.NewUser(message.From.Id, text);
@@ -157,10 +149,7 @@ namespace DiskExchange_TG_Bot
                                     chatId: message.Chat.Id,
                                     messageId: db.GetEditMessageId(message.From.Id),
                                     media: new Telegram.Bot.Types.InputMediaPhoto(photo));
-                                await bot.EditMessageCaptionAsync(message.Chat.Id,
-                                    db.GetEditMessageId(message.From.Id),
-                                    caption: db.GetCaption(message.From.Id, true),
-                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             default:
                                 Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
@@ -224,6 +213,14 @@ namespace DiskExchange_TG_Bot
                     break;
             }
             Console.WriteLine();
+        }
+
+        static async Task SetCaptionAsync(long chat, int from)
+        {
+            await bot.EditMessageCaptionAsync(chat,
+                    db.GetEditMessageId(from),
+                    caption: db.GetCaption(from, true),
+                    replyMarkup: Replies.editKeyboard(db.GetPlatform(from)));
         }
     }
 }
