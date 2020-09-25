@@ -127,6 +127,7 @@ namespace DiskExchange_TG_Bot
                                     db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.price:
                                 db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
@@ -134,6 +135,7 @@ namespace DiskExchange_TG_Bot
                                     db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.exchange:
                                 db.SetExchange(text, message.From.Id, true);
@@ -141,11 +143,13 @@ namespace DiskExchange_TG_Bot
                                     db.GetEditMessageId(message.From.Id),
                                     caption: db.GetCaption(message.From.Id, true),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.location:
                                 db.NewUser(message.From.Id, text);
                                 await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
                                     replyMarkup: Replies.keyboards.main);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 Console.WriteLine();
                                 return;
                             case (int)awaitInfoType.photo:
