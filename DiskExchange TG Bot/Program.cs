@@ -1,4 +1,4 @@
-﻿// 1.12
+﻿// 1.13
 using System;
 using System.Drawing;
 using Telegram.Bot;
@@ -21,7 +21,8 @@ namespace DiskExchange_TG_Bot
             name = 2,
             price = 3,
             exchange = 4,
-            location = 5
+            location = 5,
+            discNumber = 6
         };
 
         private static ITelegramBotClient bot;
@@ -32,7 +33,6 @@ namespace DiskExchange_TG_Bot
             bot.OnCallbackQuery += Bot_OnCallbackQuery;
             Console.Write($"2/2: Starting @discExchangeBot... ".Pastel(Color.Yellow));
             Console.Beep();
-
             try
             {
                 bot.StartReceiving();
@@ -84,17 +84,27 @@ namespace DiskExchange_TG_Bot
                         db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.price);
                         return;
                     case "Обмен":
-                        if (db.DeleteExchangeIfExists(e.CallbackQuery.From.Id, true))
+                        if (db.GetExchange(e.CallbackQuery.From.Id, true) != "")
+                        {
+                            db.SetExchange("", e.CallbackQuery.From.Id, true);
                             break;
-                        await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
+                        }
+                        else
+                        {
+                            await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                             "Отправьте названия желаемых игр в следующем сообщении.", true);
-                        db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.exchange);
-                        return;
+                            db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.exchange);
+                            return;
+                        }
                     case "Загрузить фото":
                         await bot.AnswerCallbackQueryAsync(e.CallbackQuery.Id,
                             "Отправьте фотогрфию в следующем сообщении.", true);
                         db.SetAwaitInfoType(e.CallbackQuery.From.Id, (int)awaitInfoType.photo);
-                        return; 
+                        return;
+                    case "✅ Сохранить ✅":
+                        await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
+                        await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар добавлен!\n\nℹ️ Чтобы просмотреть список ваших товаров, выберите пункт \"Мои товары\".");
+                        return;
                 }
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
                 message.MessageId,
@@ -124,24 +134,24 @@ namespace DiskExchange_TG_Bot
                                 break;
                             case (int)awaitInfoType.name:
                                 db.SetName(text, message.From.Id, true);
-                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.price:
-                                db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
-                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
+                                db.SetPrice(message.Text, message.From.Id, true);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.exchange:
                                 db.SetExchange(text, message.From.Id, true);
-                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             case (int)awaitInfoType.location:
                                 db.NewUser(message.From.Id, text);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
                                     replyMarkup: Replies.keyboards.main);
-                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 Console.WriteLine();
                                 return;
                             case (int)awaitInfoType.photo:
@@ -153,7 +163,7 @@ namespace DiskExchange_TG_Bot
                                     chatId: message.Chat.Id,
                                     messageId: db.GetEditMessageId(message.From.Id),
                                     media: new Telegram.Bot.Types.InputMediaPhoto(photo));
-                                await SetCaptionAsync(message.Chat.Id, message.From.Id);
+                                await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
                             default:
                                 Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
@@ -210,15 +220,15 @@ namespace DiskExchange_TG_Bot
                     break;
                 case "Мои товары 💿":
                     await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
+                    db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
                     break;
                 case "Избранное 🌟":
                     break;
-                case "TEST":
-                    break;
+                
             }
             Console.WriteLine();
         }
-         static async Task SetCaptionAsync(long chat, int from)
+         static async Task SetDiscCaptionAsync(long chat, int from)
          {
             await bot.EditMessageCaptionAsync(chat,
                 db.GetEditMessageId(from),

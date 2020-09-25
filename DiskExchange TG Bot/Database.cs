@@ -15,7 +15,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:E:\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path2);
+            connection = new SQLiteConnection(path1);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -69,29 +69,22 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
-        public void SetPrice(double price, int discId, bool getIdFromUser = false)
+        public void SetPrice(string price, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
                 discId = GetDiscId(discId);
-            cmd = new SQLiteCommand($"UPDATE disks SET price = {price} WHERE id = {discId}", connection);
+            cmd = new SQLiteCommand($"UPDATE disks SET price = '{price}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
 
-        internal bool DeleteExchangeIfExists(int id, bool a)
-        {
-            return a;
-        }
-
-        internal bool GetExchange(int discId, bool getIdFromUser = false)
+        internal string GetExchange(int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
                 discId = GetDiscId(discId);
-            cmd = new SQLiteCommand($"UPDATE disks SET exchange = \"\" WHERE id = {discId} AND exchange != \"\"", connection);
-            cmd.ExecuteNonQueryAsync();
             cmd = new SQLiteCommand($"SELECT exchange FROM disks WHERE id = {discId}", connection);
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
-            return rdr.GetString(0) == "";
+            return rdr.GetString(0);
         }
 
         public void SetExchange(string e, int discId, bool getIdFromUser = false)
@@ -138,7 +131,7 @@ namespace DiskExchange_TG_Bot
                 count++;
                 temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
             }
-            return temp;
+            return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
         }
         public string GetCaption(int Id, bool getIdFromUser = false)
         {

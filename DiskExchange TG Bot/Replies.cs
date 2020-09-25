@@ -109,7 +109,7 @@ namespace DiskExchange_TG_Bot
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Сохранить")
+                        InlineKeyboardButton.WithCallbackData("✅ Сохранить ✅")
                     }
                 });
         }
