@@ -15,7 +15,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:E:\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();

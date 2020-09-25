@@ -125,19 +125,23 @@ namespace DiskExchange_TG_Bot
                             case (int)awaitInfoType.name:
                                 db.SetName(text, message.From.Id, true);
                                 await SetCaptionAsync(message.Chat.Id, message.From.Id);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.price:
                                 db.SetPrice(Convert.ToDouble(message.Text), message.From.Id, true);
                                 await SetCaptionAsync(message.Chat.Id, message.From.Id);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.exchange:
                                 db.SetExchange(text, message.From.Id, true);
                                 await SetCaptionAsync(message.Chat.Id, message.From.Id);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 break;
                             case (int)awaitInfoType.location:
                                 db.NewUser(message.From.Id, text);
                                 await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
                                     replyMarkup: Replies.keyboards.main);
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 Console.WriteLine();
                                 return;
                             case (int)awaitInfoType.photo:
@@ -214,13 +218,12 @@ namespace DiskExchange_TG_Bot
             }
             Console.WriteLine();
         }
-
-        static async Task SetCaptionAsync(long chat, int from)
-        {
+         static async Task SetCaptionAsync(long chat, int from)
+         {
             await bot.EditMessageCaptionAsync(chat,
-                    db.GetEditMessageId(from),
-                    caption: db.GetCaption(from, true),
-                    replyMarkup: Replies.editKeyboard(db.GetPlatform(from)));
-        }
+                db.GetEditMessageId(from),
+                caption: db.GetCaption(from, true),
+                replyMarkup: Replies.editKeyboard(db.GetPlatform(from)));
+         }
     }
 }
