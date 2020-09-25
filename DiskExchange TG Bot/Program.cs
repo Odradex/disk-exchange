@@ -1,4 +1,4 @@
-﻿// 1.13
+﻿// 1.13.1
 using System;
 using System.Drawing;
 using Telegram.Bot;
@@ -164,6 +164,13 @@ namespace DiskExchange_TG_Bot
                                     messageId: db.GetEditMessageId(message.From.Id),
                                     media: new Telegram.Bot.Types.InputMediaPhoto(photo));
                                 await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
+                                break;
+                            case (int)awaitInfoType.discNumber:
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                var temp1 = await bot.SendPhotoAsync(message.Chat.Id,db.GetPhoto(message.From.Id, Convert.ToInt32(message.Text)),
+                                    caption: db.GetSelectedDisk(message.From.Id, Convert.ToInt32(message.Text)),
+                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                db.SetEditMessageId(message.From.Id, temp1.MessageId);
                                 break;
                             default:
                                 Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));

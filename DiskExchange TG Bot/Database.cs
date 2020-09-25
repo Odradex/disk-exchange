@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.SQLite;
+using System.Diagnostics.Tracing;
 using System.Drawing;
 using Pastel;
 
@@ -14,8 +15,8 @@ namespace DiskExchange_TG_Bot
         public Database()
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
-            string path2 = @"URI=file:E:\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -68,6 +69,23 @@ namespace DiskExchange_TG_Bot
                 discId = GetDiscId(discId);
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
+        }
+        public string GetPhoto(int Id,int num)
+        {
+            num -= 1;
+            int counter = 0;
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            while (rdr.Read())
+            {
+                if(counter == num)
+                {
+                    return rdr.GetString(3);
+                }
+                counter++;
+            }
+            return "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
+
         }
         public void SetPrice(string price, int discId, bool getIdFromUser = false)
         {
@@ -132,6 +150,26 @@ namespace DiskExchange_TG_Bot
                 temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
             }
             return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
+        }
+        public string GetSelectedDisk(int Id,int num)
+        {
+            num -= 1;
+            int counter = 0;
+            string str ="Диск под данным номером не найден...";
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            while(rdr.Read())
+            {
+                if(counter == num)
+                {
+                    str = $"💿Игра: {rdr.GetString(1)} | {rdr.GetString(2)}\n" +
+                    $"💵Цена: {rdr.GetString(4)}\n" + (rdr.GetString(5) != "" ?
+                    $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
+                    $"📍Расположение: {rdr.GetString(7)}"; ;
+                }
+                counter++;
+            }
+            return str;
         }
         public string GetCaption(int Id, bool getIdFromUser = false)
         {
