@@ -15,7 +15,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:E:\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path2);
+            connection = new SQLiteConnection(path1);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -131,9 +131,14 @@ namespace DiskExchange_TG_Bot
         {
             cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {userId}",connection);
             rdr = cmd.ExecuteReader();
-            rdr.ReadAsync();
-            string temp = rdr.GetString(1) + rdr.GetString(2) + rdr.GetString(4);
-           return temp;
+            string temp = "";
+            int count = 0;
+            while (rdr.Read())
+            {
+                count++;
+                temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
+            }
+            return temp;
         }
         public string GetCaption(int Id, bool getIdFromUser = false)
         {

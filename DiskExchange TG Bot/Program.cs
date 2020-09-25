@@ -1,4 +1,4 @@
-﻿// 1.10
+﻿// 1.12
 using System;
 using System.Drawing;
 using Telegram.Bot;
