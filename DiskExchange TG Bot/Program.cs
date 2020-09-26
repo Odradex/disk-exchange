@@ -242,6 +242,13 @@ namespace DiskExchange_TG_Bot
                     await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
                     db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
                     break;
+                case "Добавить товар 💿":
+                    db.NewDisc(message.From.Id);
+                    var temp = await bot.SendPhotoAsync(message.Chat.Id, "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA", 
+                        caption: db.GetCaption(message.From.Id, true),
+                        replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                    db.SetEditMessageId(message.From.Id, temp.MessageId);
+                    break;
 
                 case "Избранное 🌟":
                     break;
