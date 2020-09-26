@@ -22,6 +22,7 @@ namespace DiskExchange_TG_Bot
             connection.Open();
             Console.WriteLine("[READY]");
         }
+        #region AwaitInfo
         public void SetAwaitInfoType(int userId, int type)
         {
             cmd = new SQLiteCommand($"UPDATE users SET awaitInfoType = {type} WHERE id = {userId}", connection);
@@ -36,6 +37,8 @@ namespace DiskExchange_TG_Bot
                 return 0;
             return rdr.GetInt32(5);
         }
+        #endregion
+        #region Platform
         public string GetPlatform(int userId)
         {
             cmd = new SQLiteCommand($"SELECT platform FROM disks WHERE id = (SELECT editDiscId FROM users WHERE id = {userId})", connection);
@@ -43,6 +46,15 @@ namespace DiskExchange_TG_Bot
             rdr.ReadAsync();
             return rdr.GetString(0);
         }
+        public void SetPlatform(byte b, int discId, bool getIdFromUser = false)
+        {
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"UPDATE disks SET platform = '{platformNames[b]}' WHERE id = {discId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
+        #endregion
+        #region Disc
         public int NewDisc(int Id)
         {
             cmd = new SQLiteCommand($"INSERT INTO disks(sellerId, location) VALUES({Id}, (SELECT location FROM users WHERE id = {Id}))", connection);
@@ -51,6 +63,12 @@ namespace DiskExchange_TG_Bot
             cmd.ExecuteNonQueryAsync();
             return 0;
         }
+        public void DeleteDisc(int Id)
+        {
+            cmd = new SQLiteCommand($"DELETE FROM disks WHERE id = (SELECT editDiscId FROM users WHERE id = {Id})", connection);
+            cmd.ExecuteNonQuery();
+        }
+        #endregion
         public void NewUser(int userId)
         {
             cmd = new SQLiteCommand($"INSERT INTO users(id) VALUES ({userId})", connection);
@@ -63,6 +81,7 @@ namespace DiskExchange_TG_Bot
             rdr.ReadAsync();
             return rdr.GetInt32(4);
         }
+        #region Photo
         public void SetPhoto(string fileId, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -79,22 +98,13 @@ namespace DiskExchange_TG_Bot
             while (rdr.Read())
             {
                 if(counter == num)
-                {
                     return rdr.GetString(3);
-                }
                 counter++;
             }
             return "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA";
-
         }
-        public void SetPrice(string price, int discId, bool getIdFromUser = false)
-        {
-            if (getIdFromUser)
-                discId = GetDiscId(discId);
-            cmd = new SQLiteCommand($"UPDATE disks SET price = '{price}' WHERE id = {discId}", connection);
-            cmd.ExecuteNonQueryAsync();
-        }
-
+        #endregion
+        #region Exchange
         internal string GetExchange(int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -104,7 +114,6 @@ namespace DiskExchange_TG_Bot
             rdr.ReadAsync();
             return rdr.GetString(0);
         }
-
         public void SetExchange(string e, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -112,11 +121,12 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET exchange = '{e}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
-        public void SetPlatform(byte b, int discId, bool getIdFromUser = false)
+        #endregion
+        public void SetPrice(string price, int discId, bool getIdFromUser = false)
         {
             if (getIdFromUser)
                 discId = GetDiscId(discId);
-            cmd = new SQLiteCommand($"UPDATE disks SET platform = '{platformNames[b]}' WHERE id = {discId}", connection);
+            cmd = new SQLiteCommand($"UPDATE disks SET price = '{price}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
         public void SetName(string n, int discId, bool getIdFromUser = false)

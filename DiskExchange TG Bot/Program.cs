@@ -1,4 +1,4 @@
-﻿// 1.13.2
+﻿// 1.14
 using System;
 using System.Drawing;
 using Telegram.Bot;
@@ -6,6 +6,7 @@ using Pastel;
 using System.Data.SQLite;
 using Telegram.Bot.Exceptions;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace DiskExchange_TG_Bot
 {
@@ -44,7 +45,7 @@ namespace DiskExchange_TG_Bot
                 return;
             }
             Console.WriteLine("[READY]\n");
-
+            
             Console.WriteLine(">ALL SYSTEMS READY\n>Welcome, admin\n");
             Console.CursorVisible = false;
             Console.ReadLine();
@@ -104,6 +105,11 @@ namespace DiskExchange_TG_Bot
                     case "✅ Сохранить ✅":
                         await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
                         await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар добавлен!\n\nℹ️ Чтобы просмотреть список ваших товаров, выберите пункт \"Мои товары\".");
+                        return;
+                    case "❌ Удалить ❌":
+                        db.DeleteDisc(e.CallbackQuery.From.Id);
+                        await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
+                        await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар удален!\n\nℹ️ Чтобы просмотреть список ваших товаров, выберите пункт \"Мои товары\".");
                         return;
                 }
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
@@ -172,22 +178,26 @@ namespace DiskExchange_TG_Bot
                                 break;
                                 
                             case (int)awaitInfoType.discNumber:
-                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
 
                                 var temp1 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(message.From.Id, Convert.ToInt32(message.Text)),
                                     caption: db.GetSelectedDisk(message.From.Id, Convert.ToInt32(message.Text)),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 db.SetEditMessageId(message.From.Id, temp1.MessageId);
                                 break;
                             default:
-                                Console.Write(" - unprocessed message found. Deleted.".Pastel(Color.Gold));
+                                Console.WriteLine("Unprocessed message found. Deleted.".Pastel(Color.Gold));
                                 break;
                         }
-                        Console.WriteLine();
                     }
                     catch (MessageIsNotModifiedException e1)
                     {
                         log.Error(e1.Message);
+                        return;
+                    }
+                    catch (FormatException e2)
+                    {
+                        log.Error(e2.Message);
                         return;
                     }
                     await bot.DeleteMessageAsync(e.Message.Chat.Id, e.Message.MessageId);
@@ -220,8 +230,6 @@ namespace DiskExchange_TG_Bot
                         replyMarkup: Replies.keyboards.help);
                     break;
 
- 
-
                 case "Поиск 🔎":
                     break;
 
@@ -239,7 +247,6 @@ namespace DiskExchange_TG_Bot
                     break;
                 
             }
-            Console.WriteLine();
         }
          static async Task SetDiscCaptionAsync(long chat, int from)
          {
