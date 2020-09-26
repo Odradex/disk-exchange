@@ -1,4 +1,4 @@
-﻿// 1.13.1
+﻿// 1.13.2
 using System;
 using System.Drawing;
 using Telegram.Bot;
@@ -132,28 +132,33 @@ namespace DiskExchange_TG_Bot
                         {
                             case 0:
                                 break;
+
                             case (int)awaitInfoType.name:
                                 db.SetName(text, message.From.Id, true);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
+
                             case (int)awaitInfoType.price:
                                 db.SetPrice(message.Text, message.From.Id, true);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
+
                             case (int)awaitInfoType.exchange:
                                 db.SetExchange(text, message.From.Id, true);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
+
                             case (int)awaitInfoType.location:
-                                db.NewUser(message.From.Id, text);
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                db.SetLocation(text, message.From.Id);
                                 await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
                                     replyMarkup: Replies.keyboards.main);
                                 Console.WriteLine();
                                 return;
+
                             case (int)awaitInfoType.photo:
                                 if (message.Photo == null)
                                     break;
@@ -165,9 +170,11 @@ namespace DiskExchange_TG_Bot
                                     media: new Telegram.Bot.Types.InputMediaPhoto(photo));
                                 await SetDiscCaptionAsync(message.Chat.Id, message.From.Id);
                                 break;
+                                
                             case (int)awaitInfoType.discNumber:
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
-                                var temp1 = await bot.SendPhotoAsync(message.Chat.Id,db.GetPhoto(message.From.Id, Convert.ToInt32(message.Text)),
+
+                                var temp1 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(message.From.Id, Convert.ToInt32(message.Text)),
                                     caption: db.GetSelectedDisk(message.From.Id, Convert.ToInt32(message.Text)),
                                     replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
                                 db.SetEditMessageId(message.From.Id, temp1.MessageId);
@@ -187,6 +194,7 @@ namespace DiskExchange_TG_Bot
                     return;
 
                 case "/start":
+                    db.NewUser(message.From.Id);
                     await bot.SendTextMessageAsync(message.From.Id,$"Привет {message.From.Username}, это бот по обмену дисками!");
                     await bot.SendTextMessageAsync(message.From.Id,$"Пожалуйста, введите ваш город проживания:");
                     db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.location);
@@ -212,23 +220,21 @@ namespace DiskExchange_TG_Bot
                         replyMarkup: Replies.keyboards.help);
                     break;
 
-                case "Добавить товар 💿":
-                    db.NewDisc(message.From.Id);
-                    var temp = await bot.SendPhotoAsync(message.Chat.Id, "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA", 
-                        caption: db.GetCaption(message.From.Id, true),
-                        replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
-                    db.SetEditMessageId(message.From.Id, temp.MessageId);
-                    break;
+ 
+
                 case "Поиск 🔎":
                     break;
+
                 case "Мой профиль 👤":
                     await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
                         replyMarkup: Replies.keyboards.profile);
                     break;
+
                 case "Мои товары 💿":
                     await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
                     db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
                     break;
+
                 case "Избранное 🌟":
                     break;
                 

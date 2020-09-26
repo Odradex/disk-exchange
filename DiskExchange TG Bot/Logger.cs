@@ -23,7 +23,7 @@ namespace DiskExchange_TG_Bot
                         return;
                     case ConsoleKey.D:
                         new Process { 
-                            StartInfo = new ProcessStartInfo(@"D:\DiskExchangeDB.db") {
+                            StartInfo = new ProcessStartInfo(@"X:\Programs\SQLite\DiskExchangeDB.db") {
                                 UseShellExecute = true
                             }
                         }.Start();

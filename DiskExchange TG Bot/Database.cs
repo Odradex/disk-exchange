@@ -16,7 +16,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path2);
+            connection = new SQLiteConnection(path1);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -51,9 +51,9 @@ namespace DiskExchange_TG_Bot
             cmd.ExecuteNonQueryAsync();
             return 0;
         }
-        public void NewUser(int userId, string loc)
+        public void NewUser(int userId)
         {
-            cmd = new SQLiteCommand($"INSERT INTO users(id, location) VALUES {userId}, '{loc}'", connection);
+            cmd = new SQLiteCommand($"INSERT INTO users(id) VALUES ({userId})", connection);
             cmd.ExecuteNonQueryAsync();
         }
         private int GetDiscId(int Id)
@@ -162,15 +162,21 @@ namespace DiskExchange_TG_Bot
             {
                 if(counter == num)
                 {
-                    str = $"💿Игра: {rdr.GetString(1)} | {rdr.GetString(2)}\n" +
-                    $"💵Цена: {rdr.GetString(4)}\n" + (rdr.GetString(5) != "" ?
-                    $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
-                    $"📍Расположение: {rdr.GetString(7)}"; ;
+                    cmd = new SQLiteCommand($"UPDATE users SET editDiscId = {rdr.GetInt32(0)} WHERE Id = {Id}", connection);
+                    cmd.ExecuteReader();
+                    str = GetCaption(rdr.GetInt32(0));
                 }
                 counter++;
             }
             return str;
         }
+
+        internal void SetLocation(string text, int id)
+        {
+            cmd = new SQLiteCommand($"UPDATE users SET location = '{text}' WHERE Id = {id}", connection);
+            cmd.ExecuteNonQuery();
+        }
+
         public string GetCaption(int Id, bool getIdFromUser = false)
         {
             if (getIdFromUser)
@@ -179,7 +185,7 @@ namespace DiskExchange_TG_Bot
             rdr = cmd.ExecuteReader();
             rdr.Read();
             return $"💿Игра: {rdr.GetString(1)} | {rdr.GetString(2)}\n" +
-                    $"💵Цена: {((Convert.ToDouble(rdr.GetString(4)) > 0)  ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
+                    $"💵Цена: {((rdr.GetString(4) != "")  ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
                     $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
                     $"📍Расположение: {rdr.GetString(7)}";
         }
