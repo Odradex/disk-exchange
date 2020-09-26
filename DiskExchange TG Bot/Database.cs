@@ -16,7 +16,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -88,6 +88,19 @@ namespace DiskExchange_TG_Bot
                 discId = GetDiscId(discId);
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
+        }
+        public bool IsUserHasDisk(int Id)
+        {
+            int counter = 0;
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            while(rdr.Read())
+            {
+                counter++;
+            }
+            if (counter == 0)
+                return false;
+            return true;
         }
         public string GetPhoto(int Id,int num)
         {
