@@ -65,7 +65,6 @@ C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcorea
 C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\netstandard2.1\SQLite.Interop.dll
 C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.0\SQLite.Interop.dll
 C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.1\SQLite.Interop.dll
-C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.dll
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.pdb
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.AssemblyInfoInputs.cache

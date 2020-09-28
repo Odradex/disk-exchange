@@ -266,8 +266,16 @@ namespace DiskExchange_TG_Bot
                     break;
 
                 case "Мои товары 💿":
-                    await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
-                    db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
+                    if (db.IsUserHasDisk(message.From.Id))
+                    {
+                        await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
+                        db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
+                    }else
+                    {
+                        await bot.SendTextMessageAsync(message.Chat.Id, "У вас нет созданных дисков:",
+                        replyMarkup: Replies.keyboards.profile);
+                        db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                    }   
                     break;
                 case "Добавить товар 💿":
                     db.NewDisc(message.From.Id);
