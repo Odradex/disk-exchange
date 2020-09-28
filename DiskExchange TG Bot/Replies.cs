@@ -51,7 +51,7 @@ namespace DiskExchange_TG_Bot
                     {
                         new[]
                         {  
-                            new KeyboardButton("Контакты 📱"),
+                            new KeyboardButton("Контакты 📱")
                         },
                         new[]
                         {
@@ -70,12 +70,27 @@ namespace DiskExchange_TG_Bot
                         new[]
                         {
                             InlineKeyboardButton.WithUrl("Сиваков Даниил", "https://vk.com/blanker_bat"),
-                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666")
+                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666"),
                         }
-                    });
-            
+                    }); ;
+
                 }
             }
+            public static InlineKeyboardMarkup search
+            {
+                get
+                {
+                    return new InlineKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            InlineKeyboardButton.WithSwitchInlineQueryCurrentChat("Поиск 🔎")
+                        }
+                    }); ;
+
+                }
+            }
+
         }
         static public InlineKeyboardMarkup editKeyboard(string platform)
         {
