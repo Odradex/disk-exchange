@@ -38,7 +38,13 @@ namespace DiskExchange_TG_Bot
                         },
                         new[]
                         {
-                             new KeyboardButton("Назад 🔙")
+                            new KeyboardButton("Отправить номер телефона 📲"){
+                                RequestContact = true
+                            }
+                        },
+                        new[]
+                        {
+                             new KeyboardButton("Назад ↩️")
                         }
                     },
                         resizeKeyboard: true);
@@ -50,12 +56,28 @@ namespace DiskExchange_TG_Bot
                     return new ReplyKeyboardMarkup(new[]
                     {
                         new[]
-                        {  
+                        {
                             new KeyboardButton("Контакты 📱")
                         },
                         new[]
                         {
-                             new KeyboardButton("Назад 🔙")
+                             new KeyboardButton("Назад ↩️")
+                        }
+                    },
+                        resizeKeyboard: true);
+                }
+            }
+            public static ReplyKeyboardMarkup phone
+            {
+                get
+                {
+                    return new ReplyKeyboardMarkup(new[]
+                    {
+                        new[]
+                        {
+                            new KeyboardButton("Контакты 📱"){
+                                RequestContact = true
+                            }
                         }
                     },
                         resizeKeyboard: true);
@@ -91,6 +113,20 @@ namespace DiskExchange_TG_Bot
                 }
             }
 
+        }
+        static public InlineKeyboardMarkup discKeyboard()
+        {
+            return new InlineKeyboardMarkup(new[]
+            {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("⭐️ В избранное ⭐️")
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Связатся с продавцом")
+                    }
+                });
         }
         static public InlineKeyboardMarkup editKeyboard(string platform)
         {

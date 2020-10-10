@@ -22,7 +22,7 @@ namespace DiskExchange_TG_Bot
                         Console.Clear();
                         return;
                     case ConsoleKey.D:
-                        new Process { 
+                        new Process {
                             StartInfo = new ProcessStartInfo(@"X:\Programs\SQLite\DiskExchangeDB.db") {
                                 UseShellExecute = true
                             }
@@ -31,7 +31,6 @@ namespace DiskExchange_TG_Bot
                     case ConsoleKey.Escape:
                         System.Environment.Exit(0);
                         break;
-                        
                 }
                 Console.Clear();
             }
@@ -42,6 +41,8 @@ namespace DiskExchange_TG_Bot
             string text = e.Message.Text;
             if (message.Photo != null)
                 text = "[Фотография]";
+            if (message.Contact != null)
+                text = message.Contact.PhoneNumber;
             Console.WriteLine($"[{DateTime.Now}][{message.From.Username} - {message.From.Id}][MESSAGE]: ".Pastel(Color.DarkTurquoise) + text.Pastel(Color.Turquoise));
         }
         public void Query(Telegram.Bot.Args.CallbackQueryEventArgs e)

@@ -12,11 +12,21 @@ namespace DiskExchange_TG_Bot
         SQLiteCommand cmd;
         SQLiteDataReader rdr;
         string[] platformNames = { "PS4", "Xbox", "Switch" };
+        public struct discsArray
+        {
+            public int id;
+            public string name;
+            public string price;
+            public int seller;
+            public string platform;
+            public string exchange;
+            public string location;
+        }
         public Database()
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path2);
+            connection = new SQLiteConnection(path1);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -30,12 +40,12 @@ namespace DiskExchange_TG_Bot
         }
         public int GetAwaitInfoType(int userId)
         {
-            cmd = new SQLiteCommand($"SELECT * FROM users WHERE id = {userId}", connection);
+            cmd = new SQLiteCommand($"SELECT awaitInfoType FROM users WHERE id = {userId}", connection);
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
             if (rdr.HasRows == false)
                 return 0;
-            return rdr.GetInt32(5);
+            return rdr.GetInt32(0);
         }
         #endregion
         #region Platform
@@ -53,7 +63,26 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET platform = '{platformNames[b]}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
+
         #endregion
+        internal discsArray[] Search(string query)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE name LIKE '%{query}%'", connection);
+            rdr = cmd.ExecuteReader();
+            discsArray[] ret = new discsArray[0];
+            while(rdr.Read())
+            {
+                Array.Resize(ref ret, ret.Length + 1);
+                ret[ret.Length - 1].id = rdr.GetInt32(0);
+                ret[ret.Length - 1].name = rdr.GetString(1);
+                ret[ret.Length - 1].platform = rdr.GetString(2);
+                ret[ret.Length - 1].price = rdr.GetString(4);
+                ret[ret.Length - 1].exchange = rdr.GetString(5);
+                ret[ret.Length - 1].seller = rdr.GetInt32(6);
+                ret[ret.Length - 1].location = rdr.GetString(7);
+            }
+            return ret;
+        }
         #region Disc
         public int NewDisc(int Id)
         {
@@ -68,19 +97,46 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"DELETE FROM disks WHERE id = (SELECT editDiscId FROM users WHERE id = {Id})", connection);
             cmd.ExecuteNonQuery();
         }
+        private int GetDiscId(int Id)
+        {
+            cmd = new SQLiteCommand($"SELECT editDiscId FROM users WHERE id = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(0);
+        }
+        public void SetSelectedDisc(int userId, int discId)
+        {
+            cmd = new SQLiteCommand($"UPDATE users SET selectedDiscId = {discId} WHERE id = {userId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
+        public int GetSelectedDisc(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT selectedDiscId FROM users WHERE id = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(0);
+        }
         #endregion
         public void NewUser(int userId)
         {
             cmd = new SQLiteCommand($"INSERT INTO users(id) VALUES ({userId})", connection);
             cmd.ExecuteNonQueryAsync();
         }
-        private int GetDiscId(int Id)
+        #region Phone
+        public void SetUserPhone(int userId, string phone)
         {
-            cmd = new SQLiteCommand($"SELECT * FROM users WHERE id = {Id}", connection);
+            cmd = new SQLiteCommand($"UPDATE users SET phone = '{phone}' WHERE id = {userId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
+        public string GetUserPhone(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT phone FROM users WHERE id = {userId}", connection);
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
-            return rdr.GetInt32(4);
+            string str = rdr.GetString(0);
+            return str;
         }
+        #endregion
         #region Photo
         public void SetPhoto(string fileId, int discId, bool getIdFromUser = false)
         {
@@ -89,20 +145,29 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
-        public bool IsUserHasDisk(int Id)
+        public bool UserHasDisk(int Id)
         {
             int counter = 0;
             cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {Id}", connection);
             rdr = cmd.ExecuteReader();
             while(rdr.Read())
-            {
                 counter++;
-            }
+
             if (counter == 0)
                 return false;
             return true;
         }
-        public string GetPhoto(int Id,int num)
+
+        public string GetPhoto(int discId, bool getIdFromUser = false)
+        {
+            if (getIdFromUser)
+                discId = GetDiscId(discId);
+            cmd = new SQLiteCommand($"SELECT photo FROM disks WHERE id = {discId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetString(0);
+        }
+        public string GetPhotoForList(int Id,int num)
         {
             num -= 1;
             int counter = 0;
@@ -174,7 +239,7 @@ namespace DiskExchange_TG_Bot
             }
             return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
         }
-        public string GetSelectedDisk(int Id,int num)
+        public string GetSelectedFromListDisk(int Id,int num)
         {
             num -= 1;
             int counter = 0;
@@ -197,7 +262,7 @@ namespace DiskExchange_TG_Bot
         internal void SetLocation(string text, int id)
         {
             cmd = new SQLiteCommand($"UPDATE users SET location = '{text}' WHERE Id = {id}", connection);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryAsync();
         }
 
         public string GetCaption(int Id, bool getIdFromUser = false)
@@ -211,6 +276,12 @@ namespace DiskExchange_TG_Bot
                     $"💵Цена: {((rdr.GetString(4) != "")  ? rdr.GetString(4) + " BYN": "Не указана")}\n" + (rdr.GetString(5) != "" ?
                     $"🔄Обмен на: {rdr.GetString(5)}\n" : "") +
                     $"📍Расположение: {rdr.GetString(7)}";
+        }
+        public void AddSelectedDiscToFavorites(int userId)
+        {
+            int discId = GetSelectedDisc(userId);
+            cmd = new SQLiteCommand($"INSERT OR REPLACE INTO favorites(key, disc, user) VALUES({(discId ^ userId) + userId},{discId},{userId})", connection);
+            cmd.ExecuteNonQueryAsync();
         }
     }
 }
