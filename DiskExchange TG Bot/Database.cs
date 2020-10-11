@@ -3,6 +3,7 @@ using System.Data.SQLite;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using Pastel;
+using Telegram.Bot.Requests;
 
 namespace DiskExchange_TG_Bot
 {
@@ -26,7 +27,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path1);
+            connection = new SQLiteConnection(path2);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -97,6 +98,11 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"DELETE FROM disks WHERE id = (SELECT editDiscId FROM users WHERE id = {Id})", connection);
             cmd.ExecuteNonQuery();
         }
+        public void DeleteDiscFromFav(int Id)
+        {
+            cmd = new SQLiteCommand($"DELETE FROM favorites WHERE disc = {Id}", connection);
+            cmd.ExecuteNonQuery();
+        }
         private int GetDiscId(int Id)
         {
             cmd = new SQLiteCommand($"SELECT editDiscId FROM users WHERE id = {Id}", connection);
@@ -144,6 +150,18 @@ namespace DiskExchange_TG_Bot
                 discId = GetDiscId(discId);
             cmd = new SQLiteCommand($"UPDATE disks SET photo = '{fileId}' WHERE id = {discId}", connection);
             cmd.ExecuteNonQueryAsync();
+        }
+        public bool UserHasFav(int Id)
+        {
+            int counter = 0;
+            cmd = new SQLiteCommand($"SELECT * FROM favorites WHERE user = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            while (rdr.Read())
+                counter++;
+
+            if (counter == 0)
+                return false;
+            return true;
         }
         public bool UserHasDisk(int Id)
         {
@@ -219,12 +237,63 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"UPDATE users SET editMessageId = {messageId} WHERE id = {userId}", connection);
             cmd.ExecuteNonQueryAsync();
         }
+        public void SetEditDiscId(int userId, int discId)
+        {
+            cmd = new SQLiteCommand($"UPDATE users SET editDiscId = {discId} WHERE id = {userId}", connection);
+            cmd.ExecuteNonQueryAsync();
+        }
         public int GetEditMessageId(int userId)
         {
             cmd = new SQLiteCommand($"SELECT editMessageId FROM users WHERE id = {userId}", connection);
             rdr = cmd.ExecuteReader();
             rdr.ReadAsync();
             return rdr.GetInt32(0);
+        }
+        public int GetEditDiscId(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT editDiscId FROM users WHERE id = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(0);
+        }
+        public int GetOwnerId(int Id)
+        {
+            cmd = new SQLiteCommand($"SELECT sellerId FROM disks WHERE id = {Id}", connection);
+            rdr = cmd.ExecuteReader();
+            rdr.ReadAsync();
+            return rdr.GetInt32(0);
+        }
+        public string GetUserFav(int userId)
+        {
+            SQLiteCommand cmd2;
+            SQLiteDataReader rdr2;
+            int a = 0;
+            cmd = new SQLiteCommand($"SELECT * FROM favorites WHERE user = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            string temp = "";
+            int count = 0;
+            while (rdr.Read())
+            {
+                a = rdr.GetInt32(1);
+                cmd2 = new SQLiteCommand($"SELECT * FROM disks WHERE id = {a}", connection);
+                rdr2 = cmd2.ExecuteReader();
+                rdr2.Read();
+                count++;
+                temp += $"{count}: {rdr2.GetString(1)} | {rdr2.GetString(2)} | {rdr2.GetString(4)} BYN\n";
+    
+            }
+            return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
+        }
+        public int GetAmountOfFav(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM favorites WHERE user = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            int count = 0;
+            while (rdr.Read())
+            {
+                count++;
+            }
+            return count;
         }
         public string GetUserDisks(int userId)
         {
@@ -238,6 +307,25 @@ namespace DiskExchange_TG_Bot
                 temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
             }
             return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
+        }
+        public int GetFavDisc(int userId, int num)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM favorites WHERE user = {userId}", connection);
+            rdr = cmd.ExecuteReader();
+            int counter = 1;
+            while(rdr.Read())
+            {
+                if (counter == num)
+                    return rdr.GetInt32(1);
+                counter++;
+            }
+            return -1;
+        }
+        public string GetSelectedFromFav(int Id)
+        {
+            string str = "Диск под данным номером не найден...";
+            str = GetCaption(Id,false);
+            return str;
         }
         public string GetSelectedFromListDisk(int Id,int num)
         {
@@ -283,5 +371,6 @@ namespace DiskExchange_TG_Bot
             cmd = new SQLiteCommand($"INSERT OR REPLACE INTO favorites(key, disc, user) VALUES({(discId ^ userId) + userId},{discId},{userId})", connection);
             cmd.ExecuteNonQueryAsync();
         }
+
     }
 }

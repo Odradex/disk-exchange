@@ -128,6 +128,20 @@ namespace DiskExchange_TG_Bot
                     }
                 });
         }
+        static public InlineKeyboardMarkup favKeyboard()
+        {
+            return new InlineKeyboardMarkup(new[]
+            {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("❌ Удалить из избранного ❌")
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData("Связатся с продавцом")
+                    }
+                });
+        }
         static public InlineKeyboardMarkup editKeyboard(string platform)
         {
             string uploadPhoto = "Загрузить фото";

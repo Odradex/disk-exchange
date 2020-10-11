@@ -89,3 +89,4 @@ E:\TelegramBot\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtime
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\netstandard2.1\SQLite.Interop.dll
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csproj.CopyComplete
 E:\TelegramBot\disk-exchange\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache
+C:\Users\King\Source\Repos\disk-exchange2\DiskExchange TG Bot\obj\Debug\netcoreapp3.1\DiskExchange TG Bot.csprojAssemblyReference.cache

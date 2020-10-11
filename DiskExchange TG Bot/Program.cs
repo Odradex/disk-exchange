@@ -1,4 +1,4 @@
-﻿// 1.5
+﻿// 1.6
 using Pastel;
 using System;
 using System.Drawing;
@@ -22,7 +22,8 @@ namespace DiskExchange_TG_Bot
             exchange = 4,
             location = 5,
             discNumber = 6,
-            searchResult = 7
+            searchResult = 7,
+            favNumber = 8
         };
 
         private static ITelegramBotClient bot;
@@ -151,6 +152,11 @@ namespace DiskExchange_TG_Bot
                         await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
                         await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар удален!\n\nℹ️ Чтобы просмотреть список ваших товаров, выберите пункт \"Мои товары\".");
                         return;
+                    case "❌ Удалить из избранного ❌":
+                        db.DeleteDiscFromFav(db.GetEditDiscId(e.CallbackQuery.From.Id));
+                        await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
+                        await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар удален из избранного!\n\nℹ️ Чтобы просмотреть список избранного, выберите пункт \"Избранное\".");
+                        return;
                 }
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
                 message.MessageId,
@@ -168,8 +174,8 @@ namespace DiskExchange_TG_Bot
             var text = e.Message.Text;
             var message = e.Message;
             log.Message(e);
-            if (e.Message.From.Id == 652761067)
-                return;
+            //if (e.Message.From.Id == 652761067)
+            //    return;
             try
             {
                 if (message.Type == Telegram.Bot.Types.Enums.MessageType.Contact)
@@ -236,7 +242,20 @@ namespace DiskExchange_TG_Bot
                                     caption: db.GetCaption(discId),
                                     replyMarkup: Replies.discKeyboard());
                                 break;
-
+                            case (int)awaitInfoType.favNumber:
+                                if(Convert.ToInt32(message.Text) > db.GetAmountOfFav(message.From.Id) || Convert.ToInt32(message.Text) < 1)
+                                {
+                                    db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                    break;
+                                }
+                                db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                                int ownerId = db.GetOwnerId(db.GetSelectedDisc(message.From.Id));
+                                var temp2 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(db.GetFavDisc(message.From.Id,Convert.ToInt32(message.Text))),
+                                    caption: db.GetSelectedFromFav(db.GetFavDisc(message.From.Id, Convert.ToInt32(message.Text))),
+                                    replyMarkup: Replies.favKeyboard());
+                                db.SetEditMessageId(message.From.Id, temp2.MessageId);
+                                db.SetEditDiscId(message.From.Id, db.GetFavDisc(message.From.Id, Convert.ToInt32(message.Text)));
+                                break;
                             default:
                                 Console.WriteLine("Unprocessed message found. Deleted.".Pastel(Color.Gold));
                                 break;
@@ -311,6 +330,17 @@ namespace DiskExchange_TG_Bot
                         break;
 
                     case "Избранное 🌟":
+                        if (db.UserHasFav(message.From.Id))
+                        {
+                            await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserFav(message.From.Id));
+                            db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.favNumber);
+                        }
+                        else
+                        {
+                            await bot.SendTextMessageAsync(message.Chat.Id, "У вас избранных дисков:",
+                            replyMarkup: Replies.keyboards.main);
+                            db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                        }
                         break;
                 }
             }
