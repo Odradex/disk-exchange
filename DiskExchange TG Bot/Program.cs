@@ -1,4 +1,4 @@
-﻿// 1.6
+﻿// 1.6.1
 using Pastel;
 using System;
 using System.Drawing;
@@ -59,7 +59,7 @@ namespace DiskExchange_TG_Bot
             if (query.Length < 3)
                 return;
 
-            Database.discsArray[] discs = db.Search(query);
+            Database.discsArray[] discs = db.Search(query.ToLower());
             InlineQueryResultBase[] results = new InlineQueryResultArticle[discs.Length];
             for (int i = 0; i < results.Length; i++)
             {
@@ -86,8 +86,7 @@ namespace DiskExchange_TG_Bot
         private static async void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
             var data = e.CallbackQuery.Data;
-            var message = e.CallbackQuery.Message;
-
+            var message = e.CallbackQuery.Message
             log.Query(e);
 
             try
@@ -244,10 +243,8 @@ namespace DiskExchange_TG_Bot
                                 break;
                             case (int)awaitInfoType.favNumber:
                                 if(Convert.ToInt32(message.Text) > db.GetAmountOfFav(message.From.Id) || Convert.ToInt32(message.Text) < 1)
-                                {
-                                    db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                     break;
-                                }
+
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 int ownerId = db.GetOwnerId(db.GetSelectedDisc(message.From.Id));
                                 var temp2 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(db.GetFavDisc(message.From.Id,Convert.ToInt32(message.Text))),
@@ -337,9 +334,9 @@ namespace DiskExchange_TG_Bot
                         }
                         else
                         {
-                            await bot.SendTextMessageAsync(message.Chat.Id, "У вас избранных дисков:",
-                            replyMarkup: Replies.keyboards.main);
                             db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
+                            await bot.SendTextMessageAsync(message.Chat.Id, "У вас нет избранных товаров",
+                            replyMarkup: Replies.keyboards.main);
                         }
                         break;
                 }

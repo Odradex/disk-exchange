@@ -4,7 +4,6 @@ using System.Diagnostics.Tracing;
 using System.Drawing;
 using Pastel;
 using Telegram.Bot.Requests;
-
 namespace DiskExchange_TG_Bot
 {
     class Database
@@ -27,7 +26,7 @@ namespace DiskExchange_TG_Bot
         {
             string path1 = @"URI=file:X:\Programs\SQLite\DiskExchangeDB.db";
             string path2 = @"URI=file:D:\DataBase\DiskExchangeDB.db";
-            connection = new SQLiteConnection(path2);
+            connection = new SQLiteConnection(path1);
             Console.Write("1/2: Connecting to Database... ".Pastel(Color.Yellow));
             Console.Beep();
             connection.Open();
@@ -68,7 +67,7 @@ namespace DiskExchange_TG_Bot
         #endregion
         internal discsArray[] Search(string query)
         {
-            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE name LIKE '%{query}%'", connection);
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE lower(name) LIKE '%{query}%'", connection);
             rdr = cmd.ExecuteReader();
             discsArray[] ret = new discsArray[0];
             while(rdr.Read())
@@ -256,6 +255,7 @@ namespace DiskExchange_TG_Bot
             rdr.ReadAsync();
             return rdr.GetInt32(0);
         }
+        #region favorites
         public int GetOwnerId(int Id)
         {
             cmd = new SQLiteCommand($"SELECT sellerId FROM disks WHERE id = {Id}", connection);
@@ -280,7 +280,7 @@ namespace DiskExchange_TG_Bot
                 rdr2.Read();
                 count++;
                 temp += $"{count}: {rdr2.GetString(1)} | {rdr2.GetString(2)} | {rdr2.GetString(4)} BYN\n";
-    
+
             }
             return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
         }
@@ -294,19 +294,6 @@ namespace DiskExchange_TG_Bot
                 count++;
             }
             return count;
-        }
-        public string GetUserDisks(int userId)
-        {
-            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {userId}",connection);
-            rdr = cmd.ExecuteReader();
-            string temp = "";
-            int count = 0;
-            while (rdr.Read())
-            {
-                count++;
-                temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
-            }
-            return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
         }
         public int GetFavDisc(int userId, int num)
         {
@@ -324,8 +311,22 @@ namespace DiskExchange_TG_Bot
         public string GetSelectedFromFav(int Id)
         {
             string str = "Диск под данным номером не найден...";
-            str = GetCaption(Id,false);
+            str = GetCaption(Id, false);
             return str;
+        }
+        #endregion
+        public string GetUserDisks(int userId)
+        {
+            cmd = new SQLiteCommand($"SELECT * FROM disks WHERE sellerId = {userId}",connection);
+            rdr = cmd.ExecuteReader();
+            string temp = "";
+            int count = 0;
+            while (rdr.Read())
+            {
+                count++;
+                temp += $"{count}: {rdr.GetString(1)} | {rdr.GetString(2)} | {rdr.GetString(4)} BYN\n";
+            }
+            return temp + "\n\nЧтобы выбрать товар, отправьте его номер в следующем сообщении.";
         }
         public string GetSelectedFromListDisk(int Id,int num)
         {
