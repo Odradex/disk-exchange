@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿using Telegram.Bot.Types.ReplyMarkups;
 
 namespace DiskExchange_TG_Bot
 {
-    interface Replies
+    interface IReplies
     {
         struct keyboards
         {
@@ -92,7 +89,7 @@ namespace DiskExchange_TG_Bot
                         new[]
                         {
                             InlineKeyboardButton.WithUrl("Сиваков Даниил", "https://vk.com/blanker_bat"),
-                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/mr666tema666"),
+                            InlineKeyboardButton.WithUrl("Попков Артем", "https://vk.com/it_man_csharp"),
                         }
                     }); ;
 
@@ -124,7 +121,7 @@ namespace DiskExchange_TG_Bot
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Связатся с продавцом")
+                        InlineKeyboardButton.WithCallbackData("🛒 Связаться с продавцом 🛒")
                     }
                 });
         }
@@ -138,7 +135,7 @@ namespace DiskExchange_TG_Bot
                     },
                     new[]
                     {
-                        InlineKeyboardButton.WithCallbackData("Связатся с продавцом")
+                        InlineKeyboardButton.WithCallbackData("🛒 Связаться с продавцом 🛒")
                     }
                 });
         }

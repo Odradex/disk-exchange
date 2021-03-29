@@ -86,7 +86,7 @@ namespace DiskExchange_TG_Bot
         private static async void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
             var data = e.CallbackQuery.Data;
-            var message = e.CallbackQuery.Message
+            var message = e.CallbackQuery.Message;
             log.Query(e);
 
             try
@@ -95,8 +95,16 @@ namespace DiskExchange_TG_Bot
                 {
                     default:
                         return;
+                    case "🛒 Связаться с продавцом 🛒":
+                        string seller = db.GetUserPhone(e.CallbackQuery.From.Id);
+                        if (seller[0] == '+')
+                            await bot.SendContactAsync(e.CallbackQuery.From.Id, seller, "Продавец");
+                        else
+                            await bot.SendTextMessageAsync(e.CallbackQuery.From.Id, '@' + seller);
+                        return;
+
                     case "⭐️ В избранное ⭐️":
-                        db.AddSelectedDiscToFavorites(e.CallbackQuery.From.Id);
+                        db.AddSelectedOfferToFavorites(e.CallbackQuery.From.Id);
                         return;
                     case "PS4 ⚪️":
                         db.SetPlatform(0, e.CallbackQuery.From.Id, true);
@@ -147,12 +155,12 @@ namespace DiskExchange_TG_Bot
                         return;
 
                     case "❌ Удалить ❌":
-                        db.DeleteDisc(e.CallbackQuery.From.Id);
+                        db.DeleteOffer(e.CallbackQuery.From.Id);
                         await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
                         await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар удален!\n\nℹ️ Чтобы просмотреть список ваших товаров, выберите пункт \"Мои товары\".");
                         return;
                     case "❌ Удалить из избранного ❌":
-                        db.DeleteDiscFromFav(db.GetEditDiscId(e.CallbackQuery.From.Id));
+                        db.DeleteOfferFromFav(db.GetEditOfferId(e.CallbackQuery.From.Id));
                         await bot.DeleteMessageAsync(e.CallbackQuery.Message.Chat.Id, db.GetEditMessageId(e.CallbackQuery.From.Id));
                         await bot.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, "✅ Товар удален из избранного!\n\nℹ️ Чтобы просмотреть список избранного, выберите пункт \"Избранное\".");
                         return;
@@ -160,9 +168,9 @@ namespace DiskExchange_TG_Bot
                 await bot.EditMessageCaptionAsync(message.Chat.Id,
                 message.MessageId,
                 caption: db.GetCaption(e.CallbackQuery.From.Id, true),
-                replyMarkup: Replies.editKeyboard(db.GetPlatform(e.CallbackQuery.From.Id)));
+                replyMarkup: IReplies.editKeyboard(db.GetOfferPlatform(e.CallbackQuery.From.Id)));
             }
-            catch (MessageIsNotModifiedException e3)
+            catch (Exception e3)
             {
                 log.Error(e3.Message);
                 return;
@@ -170,6 +178,7 @@ namespace DiskExchange_TG_Bot
         }
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            // return;
             var text = e.Message.Text;
             var message = e.Message;
             log.Message(e);
@@ -209,7 +218,7 @@ namespace DiskExchange_TG_Bot
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 db.SetLocation(text, message.From.Id);
                                 await bot.SendTextMessageAsync(message.From.Id, $"Профиль создан.",
-                                    replyMarkup: Replies.keyboards.main);
+                                    replyMarkup: IReplies.keyboards.main);
                                 Console.WriteLine();
                                 return;
 
@@ -228,30 +237,30 @@ namespace DiskExchange_TG_Bot
                             case (int)awaitInfoType.discNumber:
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 var temp1 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhotoForList(message.From.Id, Convert.ToInt32(message.Text)),
-                                    caption: db.GetSelectedFromListDisk(message.From.Id, Convert.ToInt32(message.Text)),
-                                    replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                                    caption: db.GetSelectedFromListOffer(message.From.Id, Convert.ToInt32(message.Text)),
+                                    replyMarkup: IReplies.editKeyboard(db.GetOfferPlatform(message.From.Id)));
                                 db.SetEditMessageId(message.From.Id, temp1.MessageId);
                                 break;
 
                             case (int)awaitInfoType.searchResult:
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                                 int discId = Convert.ToInt32(message.Text.Substring(5).Split(':')[0]);
-                                db.SetSelectedDisc(message.From.Id, discId);
+                                db.SetSelectedOffer(message.From.Id, discId);
                                 await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(discId),
                                     caption: db.GetCaption(discId),
-                                    replyMarkup: Replies.discKeyboard());
+                                    replyMarkup: IReplies.discKeyboard());
                                 break;
                             case (int)awaitInfoType.favNumber:
                                 if(Convert.ToInt32(message.Text) > db.GetAmountOfFav(message.From.Id) || Convert.ToInt32(message.Text) < 1)
                                     break;
 
                                 db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
-                                int ownerId = db.GetOwnerId(db.GetSelectedDisc(message.From.Id));
+                                int ownerId = db.GetOwnerId(db.GetSelectedOffer(message.From.Id));
                                 var temp2 = await bot.SendPhotoAsync(message.Chat.Id, db.GetPhoto(db.GetFavDisc(message.From.Id,Convert.ToInt32(message.Text))),
                                     caption: db.GetSelectedFromFav(db.GetFavDisc(message.From.Id, Convert.ToInt32(message.Text))),
-                                    replyMarkup: Replies.favKeyboard());
+                                    replyMarkup: IReplies.favKeyboard());
                                 db.SetEditMessageId(message.From.Id, temp2.MessageId);
-                                db.SetEditDiscId(message.From.Id, db.GetFavDisc(message.From.Id, Convert.ToInt32(message.Text)));
+                                db.SetEditOfferId(message.From.Id, db.GetFavDisc(message.From.Id, Convert.ToInt32(message.Text)));
                                 break;
                             default:
                                 Console.WriteLine("Unprocessed message found. Deleted.".Pastel(Color.Gold));
@@ -261,7 +270,7 @@ namespace DiskExchange_TG_Bot
                         return;
 
                     case "/start":
-                        db.NewUser(message.From.Id);
+                        db.NewUser(message.From.Id, message.From.Username);
                         await bot.SendTextMessageAsync(message.From.Id, $"Привет {message.From.Username}, это бот по обмену дисками!");
                         await bot.SendTextMessageAsync(message.From.Id, $"Пожалуйста, введите ваш город проживания:");
                         db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.location);
@@ -269,44 +278,44 @@ namespace DiskExchange_TG_Bot
 
                     case "/keyboard":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
-                            replyMarkup: Replies.keyboards.main);
+                            replyMarkup: IReplies.keyboards.main);
                         break;
 
                     case "Назад ↩️":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
-                            replyMarkup: Replies.keyboards.main);
+                            replyMarkup: IReplies.keyboards.main);
                         break;
 
                     case "Контакты 📱":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
-                            replyMarkup: Replies.keyboards.contact);
+                            replyMarkup: IReplies.keyboards.contact);
                         break;
 
                     case "Помощь ❓":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
-                            replyMarkup: Replies.keyboards.help);
+                            replyMarkup: IReplies.keyboards.help);
                         break;
 
                     case "Поиск 🔎":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Чтобы начать поиск игр, нажмите на кнопку ниже:",
-                            replyMarkup: Replies.keyboards.search);
+                            replyMarkup: IReplies.keyboards.search);
                         break;
 
                     case "Мой профиль 👤":
                         await bot.SendTextMessageAsync(message.Chat.Id, "Выберите опцию из меню ниже:",
-                            replyMarkup: Replies.keyboards.profile);
+                            replyMarkup: IReplies.keyboards.profile);
                         break;
 
                     case "Мои товары 💿":
-                        if (db.UserHasDisk(message.From.Id))
+                        if (db.UserHasOffers(message.From.Id))
                         {
-                            await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserDisks(message.From.Id));
+                            await bot.SendTextMessageAsync(message.Chat.Id, db.GetUserOffers(message.From.Id));
                             db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.discNumber);
                         }
                         else
                         {
                             await bot.SendTextMessageAsync(message.Chat.Id, "У вас нет созданных дисков:",
-                            replyMarkup: Replies.keyboards.profile);
+                            replyMarkup: IReplies.keyboards.profile);
                             db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                         }
                         break;
@@ -319,10 +328,10 @@ namespace DiskExchange_TG_Bot
                                 "Вы также можете создать свой никнейм и повторить попытку.");
                             return;
                         }
-                        db.NewDisc(message.From.Id);
+                        db.NewOffer(message.From.Id);
                         var temp = await bot.SendPhotoAsync(message.Chat.Id, "AgACAgIAAxkBAAIGZF9aSti3CZNeKoW3AjRGDco3-45KAAL3rjEb0L7RSjbSrDV25SE0ECFzly4AAwEAAwIAA3gAA3CNAAIbBA",
                             caption: db.GetCaption(message.From.Id, true),
-                            replyMarkup: Replies.editKeyboard(db.GetPlatform(message.From.Id)));
+                            replyMarkup: IReplies.editKeyboard(db.GetOfferPlatform(message.From.Id)));
                         db.SetEditMessageId(message.From.Id, temp.MessageId);
                         break;
 
@@ -336,7 +345,7 @@ namespace DiskExchange_TG_Bot
                         {
                             db.SetAwaitInfoType(message.From.Id, (int)awaitInfoType.none);
                             await bot.SendTextMessageAsync(message.Chat.Id, "У вас нет избранных товаров",
-                            replyMarkup: Replies.keyboards.main);
+                            replyMarkup: IReplies.keyboards.main);
                         }
                         break;
                 }
@@ -368,7 +377,7 @@ namespace DiskExchange_TG_Bot
             await bot.EditMessageCaptionAsync(chat,
                 db.GetEditMessageId(from),
                 caption: db.GetCaption(from, true),
-                replyMarkup: Replies.editKeyboard(db.GetPlatform(from)));
+                replyMarkup: IReplies.editKeyboard(db.GetOfferPlatform(from)));
         }
     }
 }

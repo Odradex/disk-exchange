@@ -1,7 +1,6 @@
 ﻿using System;
 using Pastel;
 using System.Drawing;
-using Telegram.Bot.Args;
 using System.Diagnostics;
 
 namespace DiskExchange_TG_Bot
